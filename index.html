@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GameZone - Play & Win</title>
+    <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="flappy.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#home" class="nav-logo">
+                <i class="fas fa-gamepad"></i> GameZone
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#home" class="nav-link" onclick="closeGame()">Home</a></li>
+                <li><a href="#games" class="nav-link" onclick="closeGame()">Games</a></li>
+                <li><a href="#scores" class="nav-link" onclick="closeGame()">Scores</a></li>
+            </ul>
+        </div>
+</nav>
+
+<main>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Welcome to <span class="highlight">GameZone</span></h1>
+            <p>Play exciting games, earn points, and climb the leaderboard!</p>
+            <a href="#games" class="cta-button">Play Now <i class="fas fa-play"></i></a>
+        </div>
+    </section>
+
+    <!-- Games Section -->
+    <section id="games" class="games-section">
+        <h2 class="section-title">Choose Your Game</h2>
+        <div class="games-grid">
+            <div class="game-card" data-game="clicker">
+                <div class="game-icon"><i class="fas fa-hand-pointer"></i></div>
+                <h3>Clicker Hero</h3>
+                <p>Click to earn points and unlock upgrades!</p>
+                <button class="play-btn" onclick="startGame('clicker')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="memory">
+                <div class="game-icon"><i class="fas fa-brain"></i></div>
+                <h3>Memory Match</h3>
+                <p>Find all matching pairs!</p>
+                <button class="play-btn" onclick="startGame('memory')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="rps">
+                <div class="game-icon"><i class="fas fa-hand-rock"></i></div>
+                <h3>Rock Paper Scissors</h3>
+                <p>Beat the computer!</p>
+                <button class="play-btn" onclick="startGame('rps')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="snake">
+                <div class="game-icon"><i class="fas fa-dragon"></i></div>
+                <h3>Snake Adventure</h3>
+                <p>Eat food, grow longer, don't hit walls!</p>
+                <button class="play-btn" onclick="startGame('snake')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="flappy">
+                <div class="game-icon"><i class="fas fa-dove"></i></div>
+                <h3>Flappy Bird</h3>
+                <p>Tap to fly through the pipes!</p>
+                <button class="play-btn" onclick="startGame('flappy')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="tetris">
+                <div class="game-icon"><i class="fas fa-th-large"></i></div>
+                <h3>Tetris</h3>
+                <p>Stack blocks, clear lines, beat your high score!</p>
+                <button class="play-btn" onclick="startGame('tetris')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="blockblast">
+                <div class="game-icon"><i class="fas fa-th"></i></div>
+                <h3>Block Blast</h3>
+                <p>Match blocks smartly to clear the board!</p>
+                <button class="play-btn" onclick="startGame('blockblast')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="shooter1945">
+                <div class="game-icon"><i class="fas fa-fighter-jet"></i></div>
+                <h3>1945 Shooter</h3>
+                <p>Shoot enemies, collect power-ups, defeat bosses!</p>
+                <button class="play-btn" onclick="startGame('shooter1945')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="skyjump">
+                <div class="game-icon"><i class="fas fa-rocket"></i></div>
+                <h3>Sky Jump</h3>
+                <p>Jump from ground to galaxy! Tap to jump higher!</p>
+                <button class="play-btn" onclick="startGame('skyjump')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="wordsearch">
+                <div class="game-icon"><i class="fas fa-font"></i></div>
+                <h3>Word Search</h3>
+                <p>Find hidden words in the grid! 3 difficulties, 30 chapters!</p>
+                <button class="play-btn" onclick="startGame('wordsearch')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="pacman">
+                <div class="game-icon"><i class="fas fa-ghost"></i></div>
+                <h3>Pacman</h3>
+                <p>Eat all dots, avoid ghosts! 3 levels: Easy, Medium, Hard!</p>
+                <button class="play-btn" onclick="startGame('pacman')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="carracing">
+                <div class="game-icon">🚗</div>
+                <h3>3D Car Racing</h3>
+                <p>Race 3 laps against AI cars! WASD or touch controls.</p>
+                <button class="play-btn" onclick="startGame('carracing')">Play Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Arena -->
+    <section id="game-arena" class="game-arena">
+        <div class="arena-container">
+            <button class="back-btn" onclick="closeGame()">
+                <i class="fas fa-arrow-left"></i> Back to Games
+            </button>
+
+            <!-- Clicker Game -->
+            <div id="clicker-game" class="game-area hidden">
+                <h2>Clicker Hero</h2>
+                <div class="score-display">
+                    <i class="fas fa-coins"></i>
+                    <span id="clicker-score">0</span>
+                </div>
+                <div class="clicker-stats">
+                    <p>Click Power: <span id="click-power">1</span></p>
+                    <p>Auto Click: <span id="auto-click">0</span>/sec</p>
+                </div>
+                <div class="clicker-main">
+                    <button id="click-btn" class="main-click-btn" type="button">
+                        <i class="fas fa-mouse-pointer"></i>
+                    </button>
+                </div>
+                <div class="upgrades">
+                    <button class="upgrade-btn" onclick="buyUpgrade('click')" type="button">
+                        <i class="fas fa-plus"></i> +1 Click Power (Cost: <span id="click-cost">10</span>)
+                    </button>
+                    <button class="upgrade-btn" onclick="buyUpgrade('auto')" type="button">
+                        <i class="fas fa-clock"></i> +1 Auto Click (Cost: <span id="auto-cost">50</span>)
+                    </button>
+                    <button class="upgrade-btn" onclick="buyUpgrade('multiplier')" type="button">
+                        <i class="fas fa-bolt"></i> x2 Multiplier (Cost: <span id="multi-cost">100</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Memory Game -->
+            <div id="memory-game" class="game-area hidden">
+                <h2>Memory Match</h2>
+                <div class="memory-stats">
+                    <span>Moves: <span id="moves">0</span></span>
+                    <span>Time: <span id="time">0</span>s</span>
+                    <span>Pairs: <span id="pairs">0</span>/8</span>
+                </div>
+                <div class="memory-grid" id="memory-grid"></div>
+                <button class="restart-btn" onclick="restartMemory()" type="button">Restart</button>
+            </div>
+
+            <!-- Rock Paper Scissors -->
+            <div id="rps-game" class="game-area hidden">
+                <h2>Rock Paper Scissors</h2>
+                <div class="rps-stats">
+                    <div class="rps-score">
+                        <span>You: <span id="player-score">0</span></span>
+                        <span>Computer: <span id="comp-score">0</span></span>
+                    </div>
+                </div>
+                <div class="rps-display">
+                    <div class="rps-choice">
+                        <span>Your Choice:</span>
+                        <div id="player-choice-icon" class="rps-icon">❓</div>
+                    </div>
+                    <div class="rps-vs">VS</div>
+                    <div class="rps-choice">
+                        <span>Computer:</span>
+                        <div id="comp-choice-icon" class="rps-icon">❓</div>
+                    </div>
+                </div>
+                <div class="rps-result" id="rps-result">Choose your weapon!</div>
+                <div class="rps-buttons">
+                    <button class="rps-btn" onclick="playRPS('rock')" type="button">
+                        <i class="fas fa-hand-rock"></i>
+                        <span>Rock</span>
+                    </button>
+                    <button class="rps-btn" onclick="playRPS('paper')" type="button">
+                        <i class="fas fa-hand-paper"></i>
+                        <span>Paper</span>
+                    </button>
+                    <button class="rps-btn" onclick="playRPS('scissors')" type="button">
+                        <i class="fas fa-hand-scissors"></i>
+                        <span>Scissors</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Snake Game -->
+            <div id="snake-game" class="game-area hidden">
+                <h2>Snake Adventure</h2>
+                <div class="snake-stats">
+                    <span>Score: <span id="snake-score">0</span></span>
+                    <span>High Score: <span id="snake-high">0</span></span>
+                </div>
+                <canvas id="snake-canvas" width="400" height="400"></canvas>
+                <div class="snake-controls">
+                    <button class="snake-btn" onclick="startSnake()" type="button">Start Game</button>
+                    <div class="mobile-dpad">
+                        <button class="dpad-btn dpad-up" onclick="setSnakeDir('up')"><i class="fas fa-arrow-up"></i></button>
+                        <div class="dpad-middle">
+                            <button class="dpad-btn dpad-left" onclick="setSnakeDir('left')"><i class="fas fa-arrow-left"></i></button>
+                            <button class="dpad-btn dpad-right" onclick="setSnakeDir('right')"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                        <button class="dpad-btn dpad-down" onclick="setSnakeDir('down')"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                    <p class="snake-instructions">Use Arrow Keys or D-Pad to Move</p>
+                </div>
+            </div>
+
+            <!-- Flappy Bird Game -->
+            <div id="flappy-game" class="game-area hidden">
+                <h2>Flappy Bird</h2>
+                <div class="flappy-stats">
+                    <span>Score: <span id="flappy-score">0</span></span>
+                    <span>Best: <span id="flappy-high">0</span></span>
+                </div>
+                <canvas id="flappy-canvas" width="400" height="500"></canvas>
+                <div class="flappy-controls">
+                    <button class="flappy-start-btn" onclick="startFlappy()" type="button">Start Game</button>
+                    <button class="flappy-tap-btn" id="flappy-tap-btn" onclick="flapBird()" type="button" style="display:none;">
+                        <i class="fas fa-arrow-up"></i> TAP TO FLY
+                    </button>
+                    <p class="flappy-instructions">Press Space, Click, or Tap to Fly</p>
+                </div>
+            </div>
+
+            <!-- Tetris Game -->
+            <div id="tetris-game" class="game-area hidden">
+                <h2>Tetris</h2>
+                <div class="tetris-stats">
+                    <span>Score: <span id="tetris-score">0</span></span>
+                    <span>Level: <span id="tetris-level">1</span></span>
+                    <span>Lines: <span id="tetris-lines">0</span></span>
+                    <span>Best: <span id="tetris-high">0</span></span>
+                </div>
+                <div class="tetris-layout">
+                    <div class="tetris-board-wrapper">
+                        <canvas id="tetris-canvas" width="300" height="600"></canvas>
+                    </div>
+                    <div class="tetris-sidebar">
+                        <div class="tetris-next-box">
+                            <h4>Next</h4>
+                            <canvas id="tetris-next-canvas" width="120" height="120"></canvas>
+                        </div>
+                        <div class="tetris-hold-box">
+                            <h4>Hold</h4>
+                            <canvas id="tetris-hold-canvas" width="120" height="120"></canvas>
+                        </div>
+                        <div class="tetris-info">
+                            <p>↑ Rotate</p>
+                            <p>← → Move</p>
+                            <p>↓ Soft Drop</p>
+                            <p>Space Hard Drop</p>
+                            <p>C Hold</p>
+                            <p>P Pause</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tetris-controls">
+                    <button class="tetris-start-btn" id="tetris-start-btn" onclick="startTetris()" type="button">Start Game</button>
+                    <button class="tetris-pause-btn" id="tetris-pause-btn" onclick="togglePauseTetris()" type="button" style="display:none;">Pause</button>
+                    <div class="tetris-mobile-controls" id="tetris-mobile-controls" style="display:none;">
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('rotateLeft')"><i class="fas fa-undo"></i></button>
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('hardDrop')"><i class="fas fa-angles-down"></i></button>
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('rotate')"><i class="fas fa-redo"></i></button>
+                        </div>
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('left')"><i class="fas fa-arrow-left"></i></button>
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('down')"><i class="fas fa-arrow-down"></i></button>
+                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('right')"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn tetris-hold-btn" onclick="tetrisMobileAction('hold')"><i class="fas fa-hand-holding"></i> Hold</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block Blast -->
+            <div id="blockblast-game" class="game-area bb-game-area hidden">
+                <div class="bb-header">
+                    <span class="bb-best-icon" title="Best Score">🏆 <span id="blockblast-best">0</span></span>
+                    <div class="bb-center-score">
+                        <span class="bb-crown">👑</span>
+                        <span id="blockblast-score" class="bb-score-num">0</span>
+                    </div>
+                    <button id="blockblast-restart" class="bb-restart-btn" type="button" title="Restart">↺</button>
+                </div>
+                <div id="blockblast-board" class="blockblast-board"></div>
+            </div>
+
+            <!-- 1945 Shooter -->
+            <div id="shooter1945-game" class="game-area hidden">
+                <h2>✈️ 1945 Plane Shooter</h2>
+                <div class="shooter1945-stats">
+                    <span>Score: <span id="shooter1945-score">0</span></span>
+                    <span>Level: <span id="shooter1945-level">1</span></span>
+                    <span>Lives: <span id="shooter1945-lives">❤️❤️❤️</span></span>
+                    <span>Power: <span id="shooter1945-power" style="color:#fff;">SINGLE</span></span>
+                    <span>Best: <span id="shooter1945-high">0</span></span>
+                </div>
+                <div class="shooter1945-wrapper">
+                    <canvas id="shooter1945-canvas" width="420" height="600"></canvas>
+                </div>
+                <div class="shooter1945-controls">
+                    <button class="shooter1945-start-btn" onclick="startShooter1945()" type="button">
+                        <i class="fas fa-play"></i> Start Game
+                    </button>
+                    <button class="shooter1945-pause-btn" onclick="togglePauseShooter()" type="button">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <button class="shooter1945-bomb-btn" onclick="useBomb()" type="button">💣 Bomb</button>
+                </div>
+                <div class="shooter1945-mobile-controls">
+                    <div class="shooter1945-dpad">
+                        <button class="sdpad-btn sdpad-up"
+                            onpointerdown="gameState.shooter1945.keys['ArrowUp']=true"
+                            onpointerup="gameState.shooter1945.keys['ArrowUp']=false">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <div class="sdpad-middle">
+                            <button class="sdpad-btn sdpad-left"
+                                onpointerdown="gameState.shooter1945.keys['ArrowLeft']=true"
+                                onpointerup="gameState.shooter1945.keys['ArrowLeft']=false">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <button class="sdpad-btn sdpad-right"
+                                onpointerdown="gameState.shooter1945.keys['ArrowRight']=true"
+                                onpointerup="gameState.shooter1945.keys['ArrowRight']=false">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <button class="sdpad-btn sdpad-down"
+                            onpointerdown="gameState.shooter1945.keys['ArrowDown']=true"
+                            onpointerup="gameState.shooter1945.keys['ArrowDown']=false">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <button class="shooter1945-bomb-mobile" onclick="useBomb()">💣 BOMB</button>
+                </div>
+                <p class="shooter1945-instructions">
+                    Arrow Keys / WASD to Move • Auto-Fire • Collect Power-Ups • B = Bomb • P = Pause
+                </p>
+            </div>
+
+            <!-- Sky Jump Game -->
+            <div id="skyjump-game" class="game-area hidden">
+                <div class="sj-header">
+                    <div class="sj-title-row">
+                        <span class="sj-icon">🚀</span>
+                        <h2 class="sj-title">Sky<span class="sj-title-accent">Jump</span></h2>
+                        <span class="sj-icon">🌌</span>
+                    </div>
+                    <div class="sj-stats">
+                        <div class="sj-stat">
+                            <span class="sj-stat-label">Score</span>
+                            <span class="sj-stat-value" id="skyjump-score">0</span>
+                        </div>
+                        <div class="sj-stat sj-stat-best">
+                            <span class="sj-stat-label">🏆 Best</span>
+                            <span class="sj-stat-value" id="skyjump-high">0</span>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="skyjump-canvas" width="350" height="500"></canvas>
+                <div class="skyjump-controls">
+                    <button class="skyjump-start-btn" id="skyjump-start-btn" onclick="startSkyjump()" type="button">
+                        <i class="fas fa-rocket"></i> Launch!
+                    </button>
+                    <button class="skyjump-tap-btn" id="skyjump-tap-btn" onclick="jumpSkyjump()" type="button" style="display:none;">
+                        <i class="fas fa-arrow-up"></i> Jump
+                    </button>
+                    <p class="skyjump-instructions">← → keys or touch canvas sides to move  •  Auto-jumps on platforms!</p>
+                </div>
+            </div>
+
+            <!-- Word Search Game -->
+            <div id="wordsearch-game" class="game-area hidden">
+                <div class="ws-header">
+                    <div class="ws-title-row">
+                        <span class="ws-icon">🔤</span>
+                        <h2 class="ws-title">Word Search <span class="ws-title-accent">Universe</span></h2>
+                        <span class="ws-icon">🌌</span>
+                    </div>
+                    <p class="ws-subtitle">Hunt the hidden words — drag to select!</p>
+                </div>
+                <div class="wordsearch-stats">
+                    <div class="ws-stat">
+                        <div class="ws-stat-icon">🏆</div>
+                        <div class="ws-stat-label">Score</div>
+                        <div class="ws-stat-value" id="wordsearch-score">0</div>
+                    </div>
+                    <div class="ws-stat ws-stat-time">
+                        <div class="ws-stat-icon">⏱️</div>
+                        <div class="ws-stat-label">Time</div>
+                        <div class="ws-stat-value" id="wordsearch-time">3:00</div>
+                    </div>
+                    <div class="ws-stat">
+                        <div class="ws-stat-icon">📖</div>
+                        <div class="ws-stat-label">Chapter</div>
+                        <div class="ws-stat-value" id="wordsearch-chapter">1</div>
+                    </div>
+                    <div class="ws-stat ws-stat-best">
+                        <div class="ws-stat-icon">⭐</div>
+                        <div class="ws-stat-label">Best</div>
+                        <div class="ws-stat-value" id="wordsearch-high">0</div>
+                    </div>
+                </div>
+                <div class="wordsearch-controls">
+                    <select id="wordsearch-difficulty" class="wordsearch-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                    <select id="wordsearch-chapter-select" class="wordsearch-select">
+                        <option value="1">Chapter 1</option><option value="2">Chapter 2</option>
+                        <option value="3">Chapter 3</option><option value="4">Chapter 4</option>
+                        <option value="5">Chapter 5</option><option value="6">Chapter 6</option>
+                        <option value="7">Chapter 7</option><option value="8">Chapter 8</option>
+                        <option value="9">Chapter 9</option><option value="10">Chapter 10</option>
+                        <option value="11">Chapter 11</option><option value="12">Chapter 12</option>
+                        <option value="13">Chapter 13</option><option value="14">Chapter 14</option>
+                        <option value="15">Chapter 15</option><option value="16">Chapter 16</option>
+                        <option value="17">Chapter 17</option><option value="18">Chapter 18</option>
+                        <option value="19">Chapter 19</option><option value="20">Chapter 20</option>
+                        <option value="21">Chapter 21</option><option value="22">Chapter 22</option>
+                        <option value="23">Chapter 23</option><option value="24">Chapter 24</option>
+                        <option value="25">Chapter 25</option><option value="26">Chapter 26</option>
+                        <option value="27">Chapter 27</option><option value="28">Chapter 28</option>
+                        <option value="29">Chapter 29</option><option value="30">Chapter 30</option>
+                    </select>
+                    <button class="wordsearch-start-btn" onclick="startWordSearch()">▶ Start Game</button>
+                    <span id="wordsearch-hint" style="color: #7c6cf0; font-size: 12px;">(or press SPACE twice)</span>
+                </div>
+                <canvas id="wordsearch-canvas" width="400" height="500"></canvas>
+            </div>
+
+            <!-- Pacman Game -->
+            <div id="pacman-game" class="game-area pacman-game-area hidden">
+                <div class="pacman-hud">
+                    <div class="pacman-hud-stat">
+                        <span class="pacman-hud-label">BEST</span>
+                        <span class="pacman-hud-val" id="pacman-high">0</span>
+                    </div>
+                    <div class="pacman-hud-center">
+                        <span class="pacman-hud-title">👻 PAC-MAN</span>
+                    </div>
+                    <div class="pacman-hud-stat">
+                        <span class="pacman-hud-label">DOTS</span>
+                        <span class="pacman-hud-val" id="pacman-dots">0</span>
+                    </div>
+                </div>
+                <!-- Hidden spans kept for JS compatibility -->
+                <span id="pacman-score" style="display:none">0</span>
+                <span id="pacman-lives" style="display:none">❤️❤️❤️</span>
+                <span id="pacman-level" style="display:none">1</span>
+                <div class="pacman-difficulty">
+                    <label>Difficulty:</label>
+                    <select id="pacman-difficulty" onchange="changePacmanDifficulty()">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <canvas id="pacman-canvas" width="450" height="510"></canvas>
+                <div class="pacman-controls">
+                    <button class="pacman-start-btn" id="pacman-start-btn" onclick="startPacman()" type="button">
+                        <i class="fas fa-play"></i> Start Game
+                    </button>
+                    <button class="pacman-pause-btn" id="pacman-pause-btn" onclick="togglePausePacman()" type="button" style="display:none;">
+                        <i class="fas fa-pause"></i> Pause
+                    </button>
+                    <div class="pacman-dpad" id="pacman-dpad" style="display:none;">
+                        <button class="pacman-dpad-btn dpad-up" ontouchstart="setPacmanDir('up')" onclick="setPacmanDir('up')"><i class="fas fa-arrow-up"></i></button>
+                        <div class="pacman-dpad-middle">
+                            <button class="pacman-dpad-btn dpad-left" ontouchstart="setPacmanDir('left')" onclick="setPacmanDir('left')"><i class="fas fa-arrow-left"></i></button>
+                            <button class="pacman-dpad-btn dpad-right" ontouchstart="setPacmanDir('right')" onclick="setPacmanDir('right')"><i class="fas fa-arrow-right"></i></button>
+                        </div>
+                        <button class="pacman-dpad-btn dpad-down" ontouchstart="setPacmanDir('down')" onclick="setPacmanDir('down')"><i class="fas fa-arrow-down"></i></button>
+                    </div>
+                    <p class="pacman-instructions">WASD / Arrow Keys or D-Pad &nbsp;•&nbsp; P = Pause</p>
+                </div>
+            </div>
+            <!-- 3D Car Racing -->
+            <div id="car-racing-game" class="game-area hidden">
+                <div class="cr-header">
+                    <div class="cr-title-row">
+                        <span class="cr-icon">🏎️</span>
+                        <h2 class="cr-title">3D Car <span class="cr-title-accent">Racing</span></h2>
+                        <span class="cr-icon">🏁</span>
+                    </div>
+                    <p class="cr-subtitle">3 Laps · 3 AI Rivals · Full-Speed Action!</p>
+                </div>
+                <div class="car-racing-stats">
+                    <div class="cr-stat">
+                        <div class="cr-stat-icon">🔄</div>
+                        <div class="cr-stat-label">Lap</div>
+                        <div class="cr-stat-value"><span id="car-lap">1</span><span class="cr-stat-total">/3</span></div>
+                    </div>
+                    <div class="cr-stat cr-stat-pos">
+                        <div class="cr-stat-icon">📍</div>
+                        <div class="cr-stat-label">Position</div>
+                        <div class="cr-stat-value" id="car-position">1st</div>
+                    </div>
+                    <div class="cr-stat cr-stat-time">
+                        <div class="cr-stat-icon">⏱️</div>
+                        <div class="cr-stat-label">Lap Time</div>
+                        <div class="cr-stat-value"><span id="car-lap-time">0.0</span><span class="cr-stat-unit">s</span></div>
+                    </div>
+                    <div class="cr-stat cr-stat-best">
+                        <div class="cr-stat-icon">⭐</div>
+                        <div class="cr-stat-label">Best Lap</div>
+                        <div class="cr-stat-value"><span id="car-best-lap">--</span><span class="cr-stat-unit">s</span></div>
+                    </div>
+                </div>
+                <div class="car-racing-canvas-wrapper">
+                    <canvas id="car-racing-canvas"></canvas>
+                </div>
+                <div class="car-racing-controls">
+                    <button class="car-racing-start-btn" onclick="startCarRacing()">
+                        🏁 Start Race
+                    </button>
+                    <div class="car-racing-mobile-controls">
+                        <div class="car-gas-pedals">
+                            <button class="car-btn car-accel" ontouchstart="racingState.touchControls.accel=true" ontouchend="racingState.touchControls.accel=false">⬆ GAS</button>
+                            <button class="car-btn car-brake" ontouchstart="racingState.touchControls.brake=true" ontouchend="racingState.touchControls.brake=false">⬇ BRAKE</button>
+                        </div>
+                        <div class="car-steering">
+                            <button class="car-btn car-left" ontouchstart="racingState.touchControls.left=true" ontouchend="racingState.touchControls.left=false">◀</button>
+                            <button class="car-btn car-right" ontouchstart="racingState.touchControls.right=true" ontouchend="racingState.touchControls.right=false">▶</button>
+                        </div>
+                    </div>
+                    <p class="car-racing-instructions">🎮 WASD / Arrow Keys · Touch buttons on mobile</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section id="scores" class="leaderboard-section">
+        <h2 class="section-title">Leaderboard</h2>
+        <div class="leaderboard">
+            <div class="leaderboard-card">
+                <h3><i class="fas fa-trophy"></i> Top Scores</h3>
+                <ul id="top-scores"></ul>
+            </div>
+        </div>
+    </section>
+</main>
+
+    <footer class="sticky-footer">
+        <p>&copy; 2026 GameZone. All rights reserved. <i class="fas fa-gamepad"></i></p>
+    </footer>
+<script src="game.js"></script>
+<script src="three.min.js"></script>
+<script src="clickergame.js"></script>
+<script src="memorygame.js"></script>
+<script src="rockpaperscissors.js"></script>
+<script src="snake-game.js"></script>
+<script src="1945-plane-shooter.js"></script>
+<script src="skyjump-fixed.js"></script>
+<script src="pacman-game.js"></script>
+<script src="skyjump-game.js"></script>
+<script src="wordsearch-fixed.js"></script>
+<script src="tetris-patch.js"></script>
+<script src="flappy-game.js"></script>
+<script src="blockblast-game.js"></script>
+<script src="car-racing-game.js"></script>
+</body>
+</html>
