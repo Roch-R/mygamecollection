@@ -1110,6 +1110,11 @@
     <!-- Universal Game Control Bar (mobile popup for all games) -->
     <div id="ugb" class="ugb">
 
+        <!-- Exit button: always visible in the UGB bar on mobile -->
+        <button class="ugb-exit-btn" onclick="closeGame()" aria-label="Exit game">
+            <i class="fas fa-times"></i> EXIT
+        </button>
+
         <!-- D-pad: snake, pacman, 1945 shooter -->
         <div class="ugb-panel" id="ugb-dpad">
             <div class="ugb-dpad-wrap">
@@ -1178,6 +1183,11 @@
                 ontouchend="racingState.touchControls.nitro=false"
                 onmousedown="racingState.touchControls.nitro=true"
                 onmouseup="racingState.touchControls.nitro=false">⚡ NITRO</button>
+        </div>
+
+        <!-- Block Blast: piece tray (populated by buildTray() on mobile) -->
+        <div class="ugb-panel ugb-hidden ugb-bb-panel" id="ugb-blockblast">
+            <!-- buildTray() fills this with bb-slot-0/1/2 on mobile -->
         </div>
 
     </div>

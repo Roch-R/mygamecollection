@@ -520,9 +520,10 @@ var UGB_PANELS = {
     breakout:    'ugb-lr',
     flappy:      'ugb-tap',
     skyjump:     'ugb-tap',
-    carracing:   'ugb-carracing'
+    carracing:   'ugb-carracing',
+    blockblast:  'ugb-blockblast'
 };
-var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap', 'ugb-carracing'];
+var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap', 'ugb-carracing', 'ugb-blockblast'];
 
 function showGameBar(game) {
     _ugbGame = game;
@@ -538,6 +539,10 @@ function showGameBar(game) {
         var panel = document.getElementById(panelId);
         if (panel) panel.classList.remove('ugb-hidden');
         bar.classList.add('visible');
+        // Block Blast: populate tray into UGB panel once it's visible
+        if (game === 'blockblast' && typeof window.buildBlockBlastTray === 'function') {
+            setTimeout(window.buildBlockBlastTray, 50);
+        }
     } else {
         bar.classList.remove('visible');
     }
@@ -644,6 +649,7 @@ function stopAllGames() {
     if (typeof window._stopAirHockey     === 'function') window._stopAirHockey();
     if (typeof window._stopBubbleShooter === 'function') window._stopBubbleShooter();
     if (typeof window._stopPlatformer    === 'function') window._stopPlatformer();
+    if (typeof window._stopBlockBlast    === 'function') window._stopBlockBlast();
 
     // Timer-based games
     if (typeof window._stopWhackAMole   === 'function') window._stopWhackAMole();

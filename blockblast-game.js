@@ -307,7 +307,7 @@ function buildUI() {
     S.canvas=cv; S.ctx=cv.getContext('2d');
 
     if (!isMobile) wrap.insertBefore(tray,cv);
-    else           wrap.appendChild(tray);
+    // On mobile the piece tray lives in the UGB popup bar — don't add inline tray
 
     cv.addEventListener('touchstart',e=>{ if(e.touches.length>1)e.preventDefault(); },{passive:false});
     cv.addEventListener('mousemove',  evBoardMove);
@@ -321,28 +321,28 @@ function buildUI() {
 }
 
 function buildTray() {
-    const tray=document.getElementById('bb-tray');
-    if (!tray) return;
-    tray.innerHTML='';
     const isMobile=window.innerWidth<600;
-    const pieceScale=Math.max(0.7,CS*0.025);
-    const slotW=isMobile?Math.floor((GRID*(CS+GAP)-GAP+PAD*2)/3-8):100;
-    const slotH=isMobile?Math.floor(slotW*0.85):90;
+    const trayEl=isMobile?document.getElementById('ugb-blockblast'):document.getElementById('bb-tray');
+    if (!trayEl) return;
+    trayEl.innerHTML='';
+    const pieceScale=isMobile?1.6:Math.max(0.7,CS*0.025);
+    const slotW=isMobile?90:100;
+    const slotH=isMobile?84:90;
 
     S.pieces.forEach((piece,idx)=>{
         const slot=document.createElement('div');
         slot.id='bb-slot-'+idx;
-        slot.style.cssText=`background:transparent;border:none;border-radius:0;width:${slotW}px;min-height:${slotH}px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;opacity:${piece?'1':'0.15'};cursor:${piece?'grab':'default'};transition:transform 0.12s,opacity 0.12s;`;
+        slot.style.cssText=`background:${isMobile?'rgba(20,25,60,0.85)':'transparent'};border:${isMobile?'2px solid rgba(102,126,234,0.35)':'none'};border-radius:${isMobile?'14px':'0'};width:${slotW}px;min-height:${slotH}px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;opacity:${piece?'1':'0.2'};cursor:${piece?'grab':'default'};transition:transform 0.12s,opacity 0.12s,box-shadow 0.12s;`;
         slot.draggable=false;
         slot.addEventListener('dragstart',e=>e.preventDefault());
         if (piece) {
             slot.appendChild(mkPieceCanvas(piece,pieceScale));
             slot.addEventListener('mousedown',e=>startDrag(idx,e.clientX,e.clientY));
             slot.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); const t=e.touches[0]; startDrag(idx,t.clientX,t.clientY); },{passive:false});
-            slot.onmouseenter=()=>slot.style.transform='scale(1.1)';
-            slot.onmouseleave=()=>slot.style.transform='scale(1)';
+            slot.onmouseenter=()=>{ slot.style.transform='scale(1.1)'; if(isMobile) slot.style.boxShadow='0 0 14px rgba(102,126,234,0.5)'; };
+            slot.onmouseleave=()=>{ slot.style.transform='scale(1)'; slot.style.boxShadow=''; };
         }
-        tray.appendChild(slot);
+        trayEl.appendChild(slot);
     });
 }
 
@@ -843,6 +843,8 @@ function updateScoreEl() {
 // ── Expose ────────────────────────────────────────────
 
 window.initBlockBlast=initBlockBlast;
+window.buildBlockBlastTray=buildTray;
+window._stopBlockBlast=function(){ if(S.animFrame){cancelAnimationFrame(S.animFrame);S.animFrame=null;} S.canvas=null; S.ctx=null; };
 
 let _bbResizeTimer=null;
 window.addEventListener('resize',()=>{
