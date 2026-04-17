@@ -1146,6 +1146,41 @@
             <button class="ugb-key ugb-huge" ontouchstart="ugbDir('tap',true);event.preventDefault()" ontouchend="ugbDir('tap',false)" onmousedown="ugbDir('tap',true)" onmouseup="ugbDir('tap',false)">▲ &nbsp; TAP &nbsp; ▲</button>
         </div>
 
+        <!-- Car Racing: steer + gas/brake + nitro -->
+        <div class="ugb-panel ugb-hidden ugb-car-panel" id="ugb-carracing">
+            <div class="ugb-car-row">
+                <button class="ugb-key ugb-car-steer"
+                    ontouchstart="racingState.touchControls.left=true;event.preventDefault()"
+                    ontouchend="racingState.touchControls.left=false"
+                    onmousedown="racingState.touchControls.left=true"
+                    onmouseup="racingState.touchControls.left=false">◀</button>
+
+                <div class="ugb-car-mid">
+                    <button class="ugb-key ugb-car-gas"
+                        ontouchstart="racingState.touchControls.accel=true;event.preventDefault()"
+                        ontouchend="racingState.touchControls.accel=false"
+                        onmousedown="racingState.touchControls.accel=true"
+                        onmouseup="racingState.touchControls.accel=false">⬆ GAS</button>
+                    <button class="ugb-key ugb-car-brake"
+                        ontouchstart="racingState.touchControls.brake=true;event.preventDefault()"
+                        ontouchend="racingState.touchControls.brake=false"
+                        onmousedown="racingState.touchControls.brake=true"
+                        onmouseup="racingState.touchControls.brake=false">⬇ BRAKE</button>
+                </div>
+
+                <button class="ugb-key ugb-car-steer"
+                    ontouchstart="racingState.touchControls.right=true;event.preventDefault()"
+                    ontouchend="racingState.touchControls.right=false"
+                    onmousedown="racingState.touchControls.right=true"
+                    onmouseup="racingState.touchControls.right=false">▶</button>
+            </div>
+            <button class="ugb-key ugb-car-nitro"
+                ontouchstart="racingState.touchControls.nitro=true;event.preventDefault()"
+                ontouchend="racingState.touchControls.nitro=false"
+                onmousedown="racingState.touchControls.nitro=true"
+                onmouseup="racingState.touchControls.nitro=false">⚡ NITRO</button>
+        </div>
+
     </div>
 
     <footer class="sticky-footer">

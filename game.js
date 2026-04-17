@@ -519,9 +519,10 @@ var UGB_PANELS = {
     platformer:  'ugb-platform',
     breakout:    'ugb-lr',
     flappy:      'ugb-tap',
-    skyjump:     'ugb-tap'
+    skyjump:     'ugb-tap',
+    carracing:   'ugb-carracing'
 };
-var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap'];
+var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap', 'ugb-carracing'];
 
 function showGameBar(game) {
     _ugbGame = game;
