@@ -66,6 +66,7 @@ let S = {
     rings: [], ghostPulse: 0,
     muted: false, gridPulse: 0, sheenPhase: 0,
     lastT: 0,
+    selectedIdx: null,  // mobile tap-to-select mode
 };
 
 // ── Utilities ─────────────────────────────────────────
@@ -309,7 +310,7 @@ function buildUI() {
     if (!isMobile) wrap.insertBefore(tray,cv);
     // On mobile the piece tray lives in the UGB popup bar — don't add inline tray
 
-    cv.addEventListener('touchstart',e=>{ if(e.touches.length>1)e.preventDefault(); },{passive:false});
+    cv.addEventListener('touchstart', evBoardTStart, {passive:false});
     cv.addEventListener('mousemove',  evBoardMove);
     cv.addEventListener('mouseleave', evBoardLeave);
     cv.addEventListener('mouseup',    evBoardUp);
@@ -332,18 +333,91 @@ function buildTray() {
     S.pieces.forEach((piece,idx)=>{
         const slot=document.createElement('div');
         slot.id='bb-slot-'+idx;
-        slot.style.cssText=`background:${isMobile?'rgba(20,25,60,0.85)':'transparent'};border:${isMobile?'2px solid rgba(102,126,234,0.35)':'none'};border-radius:${isMobile?'14px':'0'};width:${slotW}px;min-height:${slotH}px;display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;opacity:${piece?'1':'0.2'};cursor:${piece?'grab':'default'};transition:transform 0.12s,opacity 0.12s,box-shadow 0.12s;`;
+        const isSel=isMobile&&S.selectedIdx===idx;
+        slot.style.cssText=`background:${isMobile?'rgba(20,25,60,0.85)':'transparent'};border:${isMobile?(isSel?'2px solid #667eea':'2px solid rgba(102,126,234,0.35)'):'none'};border-radius:${isMobile?'14px':'0'};width:${slotW}px;min-height:${slotH}px;display:flex;align-items:center;justify-content:center;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;opacity:${piece?'1':'0.2'};cursor:${piece?(isMobile?'pointer':'grab'):'default'};transition:transform 0.12s,opacity 0.12s,box-shadow 0.12s;${isSel?'box-shadow:0 0 18px rgba(102,126,234,0.75);transform:scale(1.08);':''}`;
         slot.draggable=false;
         slot.addEventListener('dragstart',e=>e.preventDefault());
         if (piece) {
             slot.appendChild(mkPieceCanvas(piece,pieceScale));
-            slot.addEventListener('mousedown',e=>startDrag(idx,e.clientX,e.clientY));
-            slot.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); const t=e.touches[0]; startDrag(idx,t.clientX,t.clientY); },{passive:false});
-            slot.onmouseenter=()=>{ slot.style.transform='scale(1.1)'; if(isMobile) slot.style.boxShadow='0 0 14px rgba(102,126,234,0.5)'; };
-            slot.onmouseleave=()=>{ slot.style.transform='scale(1)'; slot.style.boxShadow=''; };
+            if (isMobile) {
+                // Tap-to-select: tap a piece to select it, tap canvas to place
+                slot.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); selectPiece(idx); },{passive:false});
+            } else {
+                slot.addEventListener('mousedown',e=>startDrag(idx,e.clientX,e.clientY));
+                slot.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); const t=e.touches[0]; startDrag(idx,t.clientX,t.clientY); },{passive:false});
+            }
+            slot.onmouseenter=()=>{ if(!isMobile) slot.style.transform='scale(1.1)'; };
+            slot.onmouseleave=()=>{ if(!isMobile) slot.style.transform='scale(1)'; };
         }
         trayEl.appendChild(slot);
     });
+}
+
+function selectPiece(idx) {
+    if (!S.pieces[idx]) return;
+    if (S.selectedIdx===idx) {
+        // Deselect if tapping same piece
+        S.selectedIdx=null;
+        S.ghost=[]; S.ghostOk=false;
+        buildTray();
+        return;
+    }
+    S.selectedIdx=idx;
+    S.ghost=[]; S.ghostOk=false;
+    vibrate(18);
+    buildTray();
+}
+
+function placePieceAt(gridR, gridC) {
+    const idx=S.selectedIdx;
+    if (idx===null||!S.pieces[idx]) return;
+    const shape=S.pieces[idx].shape;
+    const valid=shape.every(([dr,dc])=>{
+        const nr=gridR+dr,nc=gridC+dc;
+        return nr>=0&&nr<GRID&&nc>=0&&nc<GRID&&S.board[nr][nc]===null;
+    });
+    if (!valid) { beep('bad'); vibrate([80,40,80]); shakeBoard(); return; }
+
+    const colorIdx=S.pieces[idx].colorIdx;
+    shape.forEach(([dr,dc])=>{ S.board[gridR+dr][gridC+dc]=colorIdx; });
+    S.pieces[idx]=null;
+    S.selectedIdx=null;
+    S.ghost=[]; S.ghostOk=false;
+    beep('place'); vibrate(28);
+
+    shape.forEach(([dr,dc])=>{
+        const r=gridR+dr,c=gridC+dc,key=`${r}_${c}`;
+        S.placedCells[key]={scale:1.35,vel:0,t:0,colorIdx};
+        spawnParticles(r,c,colorIdx,4);
+        spawnPlaceGlow(r,c,colorIdx);
+    });
+
+    const cleared=doClears();
+    if (cleared>0) { S.combo++; vibrate(cleared>=2?[55,25,55,25,80]:[45,25,45]); }
+    else           S.combo=0;
+
+    const multiplier=S.combo>1?Math.min(4,1+(S.combo-1)*0.5):1;
+    const basePoints=shape.length*10+cleared*100;
+    const pts=Math.round(basePoints*multiplier);
+    S.score+=pts;
+    if (S.score>S.best) { S.best=S.score; localStorage.setItem('bb_best',S.best); }
+
+    const sumR=shape.reduce((a,[r])=>a+r,0)/shape.length;
+    const sumC=shape.reduce((a,[,c])=>a+c,0)/shape.length;
+    const px=PAD+(gridC+sumC)*(CS+GAP)+CS/2;
+    const py=PAD+(gridR+sumR)*(CS+GAP);
+    spawnScorePopup((S.combo>1&&cleared>0)?`+${pts} ×${multiplier%1===0?multiplier:multiplier.toFixed(1)}`:`+${pts}`,px,py);
+
+    if (cleared>0) {
+        beep(S.combo>=3?'combo':'clear');
+        const msg=S.combo>=3?`🔥 COMBO ×${S.combo}! +${pts}`:cleared>=2?`🔥 ${cleared} lines! +${pts}`:`✨ Line cleared! +${pts}`;
+        if (window.showToast) window.showToast(msg,'success');
+    }
+
+    if (S.pieces.every(p=>p===null)) S.pieces=[mkPiece(),mkPiece(),mkPiece()];
+    buildTray();
+    if (window.saveScore) window.saveScore('blockblast',S.score);
+    if (isGameOver()) setTimeout(showGameOver,350);
 }
 
 // ── Drawing ───────────────────────────────────────────
@@ -665,10 +739,34 @@ function evDocMove(e)  { if(!S.drag)return; setFloatTarget(e.clientX,e.clientY);
 function evDocUp(e)    { rmDocListeners(); finishDrag(e.clientX,e.clientY); }
 function evDocTMove(e) { e.preventDefault(); if(!S.drag)return; const t=e.touches[0]; setFloatTarget(t.clientX,t.clientY); updateGhost(t.clientX,t.clientY); }
 function evDocTEnd(e)  { e.preventDefault(); rmDocListeners(); const t=e.changedTouches[0]; finishDrag(t.clientX,t.clientY); }
+function evBoardTStart(e) {
+    if (e.touches.length>1) { e.preventDefault(); return; }
+    const t=e.touches[0];
+    const isMobile=window.innerWidth<600;
+    if (isMobile && S.selectedIdx!==null) {
+        // Tap-to-place mode: place selected piece on tap
+        e.preventDefault();
+        const cell=boardCellAt(t.clientX,t.clientY);
+        if (cell) placePieceAt(cell.r,cell.c);
+        return;
+    }
+    if (isMobile && S.selectedIdx===null) {
+        // Update ghost preview on touchmove even without drag
+        updateGhost(t.clientX,t.clientY);
+    }
+}
 function evBoardMove(e)  { if(!S.drag)return; setFloatTarget(e.clientX,e.clientY); updateGhost(e.clientX,e.clientY); }
 function evBoardLeave()  { if(!S.drag)return; S.ghost=[]; S.ghostOk=false; }
 function evBoardUp(e)    { if(!S.drag)return; rmDocListeners(); finishDrag(e.clientX,e.clientY); }
-function evBoardTMove(e) { e.preventDefault(); if(!S.drag)return; const t=e.touches[0]; setFloatTarget(t.clientX,t.clientY); updateGhost(t.clientX,t.clientY); }
+function evBoardTMove(e) {
+    const isMobile=window.innerWidth<600;
+    if (isMobile && S.selectedIdx!==null) {
+        // Show ghost preview while sliding finger over grid (no drag needed)
+        const t=e.touches[0]; updateGhost(t.clientX,t.clientY); return;
+    }
+    e.preventDefault(); if(!S.drag)return;
+    const t=e.touches[0]; setFloatTarget(t.clientX,t.clientY); updateGhost(t.clientX,t.clientY);
+}
 function evBoardTEnd(e)  { e.preventDefault(); if(!S.drag)return; rmDocListeners(); const t=e.changedTouches[0]; finishDrag(t.clientX,t.clientY); }
 
 function rmDocListeners() {
@@ -680,10 +778,12 @@ function rmDocListeners() {
 }
 
 function updateGhost(cx,cy) {
-    if (!S.drag) return;
+    // Works for drag mode OR mobile tap-to-select mode
+    const source = S.drag || (S.selectedIdx!==null ? S.pieces[S.selectedIdx] : null);
+    if (!source) { S.ghost=[]; S.ghostOk=false; return; }
     const cell=boardCellAt(cx,cy);
     if (!cell) { S.ghost=[]; S.ghostOk=false; return; }
-    S.ghost=S.drag.shape.map(([dr,dc])=>[cell.r+dr,cell.c+dc]);
+    S.ghost=source.shape.map(([dr,dc])=>[cell.r+dr,cell.c+dc]);
     S.ghostOk=S.ghost.every(([r,c])=>r>=0&&r<GRID&&c>=0&&c<GRID&&S.board[r][c]===null);
 }
 
