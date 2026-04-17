@@ -191,6 +191,86 @@
                 <p>Bounce the ball, smash all the bricks. 5 levels of mayhem!</p>
                 <button class="play-btn" onclick="startGame('breakout')">Play Now</button>
             </div>
+            <div class="game-card" data-game="pong">
+                <span class="card-badge badge-easy">Easy</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🏓</div>
+                <h3>Pong</h3>
+                <p>Classic paddle game! First to 7 points wins!</p>
+                <button class="play-btn" onclick="startGame('pong')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="airhockey">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🏒</div>
+                <h3>Air Hockey</h3>
+                <p>Slide your mallet, score goals! First to 7 wins!</p>
+                <button class="play-btn" onclick="startGame('airhockey')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="whackamole">
+                <span class="card-badge badge-easy">Easy</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🐹</div>
+                <h3>Whack-a-Mole</h3>
+                <p>Smash the moles! 30 seconds of chaos with combos!</p>
+                <button class="play-btn" onclick="startGame('whackamole')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="bubbleshooter">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🫧</div>
+                <h3>Bubble Shooter</h3>
+                <p>Aim and pop matching bubbles before they reach you!</p>
+                <button class="play-btn" onclick="startGame('bubbleshooter')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="simonsays">
+                <span class="card-badge badge-easy">Easy</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🔴</div>
+                <h3>Simon Says</h3>
+                <p>Watch the pattern and repeat it! How far can you go?</p>
+                <button class="play-btn" onclick="startGame('simonsays')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="sudoku">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🔢</div>
+                <h3>Sudoku</h3>
+                <p>Fill the 9x9 grid! 3 difficulty levels, unlimited puzzles!</p>
+                <button class="play-btn" onclick="startGame('sudoku')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="chess">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">♟️</div>
+                <h3>Chess</h3>
+                <p>Classic chess vs CPU! Checkmate the king to win!</p>
+                <button class="play-btn" onclick="startGame('chess')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="hangman">
+                <span class="card-badge badge-easy">Easy</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🔤</div>
+                <h3>Hangman</h3>
+                <p>Guess the word before the hangman is complete!</p>
+                <button class="play-btn" onclick="startGame('hangman')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="typingspeed">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">⌨️</div>
+                <h3>Typing Speed</h3>
+                <p>Test your WPM! Type fast and accurately to score high!</p>
+                <button class="play-btn" onclick="startGame('typingspeed')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="platformer">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🏃</div>
+                <h3>Platformer</h3>
+                <p>Jump, run, collect coins and reach the flag! 5 levels!</p>
+                <button class="play-btn" onclick="startGame('platformer')">Play Now</button>
+            </div>
         </div>
     </section>
 
@@ -725,6 +805,247 @@
                     <p class="pacman-instructions">WASD / Arrow Keys or D-Pad &nbsp;•&nbsp; P = Pause</p>
                 </div>
             </div>
+            <!-- Pong -->
+            <div id="pong-game" class="game-area hidden">
+                <h2>🏓 Pong</h2>
+                <div class="pong-hud">
+                    <span class="pong-label">YOU</span>
+                    <span class="pong-score-val" id="pong-player-score">0</span>
+                    <span class="pong-vs">VS</span>
+                    <span class="pong-score-val" id="pong-cpu-score">0</span>
+                    <span class="pong-label">CPU</span>
+                </div>
+                <div class="pong-wrap">
+                    <canvas id="pong-canvas"></canvas>
+                </div>
+                <div class="game-over-overlay" id="pong-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="pong-result">Game Over</div>
+                        <div class="game-over-score" id="pong-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartPong()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Air Hockey -->
+            <div id="airhockey-game" class="game-area hidden">
+                <h2>🏒 Air Hockey</h2>
+                <div class="pong-hud">
+                    <span class="pong-label">YOU</span>
+                    <span class="pong-score-val" id="ah-player-score">0</span>
+                    <span class="pong-vs">VS</span>
+                    <span class="pong-score-val" id="ah-cpu-score">0</span>
+                    <span class="pong-label">CPU</span>
+                </div>
+                <div class="pong-wrap">
+                    <canvas id="airhockey-canvas"></canvas>
+                </div>
+                <div class="game-over-overlay" id="ah-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="ah-result">Game Over</div>
+                        <div class="game-over-score" id="ah-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartAirHockey()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Whack-a-Mole -->
+            <div id="whackamole-game" class="game-area hidden">
+                <h2>🐹 Whack-a-Mole</h2>
+                <div class="wam-toolbar">
+                    <button class="wam-diff-btn" data-diff="easy" onclick="setWamDiff('easy')">Easy</button>
+                    <button class="wam-diff-btn active" data-diff="medium" onclick="setWamDiff('medium')">Medium</button>
+                    <button class="wam-diff-btn" data-diff="hard" onclick="setWamDiff('hard')">Hard</button>
+                </div>
+                <div class="wam-status">
+                    <span>Score: <b id="wam-score">0</b></span>
+                    <span>Time: <b id="wam-time">30</b>s</span>
+                    <span>Combo: <b id="wam-combo">x1</b></span>
+                </div>
+                <div class="wam-grid" id="wam-grid"></div>
+                <button class="wam-start-btn" id="wam-start-btn" onclick="startWam()">▶ Start Game</button>
+                <div class="game-over-overlay" id="wam-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title">🐹 Time's Up!</div>
+                        <div class="game-over-score" id="wam-result-score">Score: 0</div>
+                        <div class="game-over-sub" id="wam-result-combo"></div>
+                        <button class="game-over-btn" onclick="restartWam()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bubble Shooter -->
+            <div id="bubbleshooter-game" class="game-area hidden">
+                <h2>🫧 Bubble Shooter</h2>
+                <div class="bs-hud">
+                    <span>Score: <b id="bs-score">0</b></span>
+                    <span>Level: <b id="bs-level">1</b></span>
+                    <span>Next: <span id="bs-next" class="bs-next-bubble"></span></span>
+                </div>
+                <div class="bs-wrap">
+                    <canvas id="bubbleshooter-canvas"></canvas>
+                </div>
+                <div class="game-over-overlay" id="bs-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="bs-result">Game Over</div>
+                        <div class="game-over-score" id="bs-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartBubbleShooter()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simon Says -->
+            <div id="simonsays-game" class="game-area hidden">
+                <h2>🔴 Simon Says</h2>
+                <div class="simon-status">
+                    <span>Round: <b id="simon-round">0</b></span>
+                    <span>Score: <b id="simon-score">0</b></span>
+                </div>
+                <div id="simon-msg" class="simon-msg">Press Start to play!</div>
+                <div class="simon-grid">
+                    <button class="simon-btn simon-red" data-color="red" onclick="pressSimon('red')"></button>
+                    <button class="simon-btn simon-blue" data-color="blue" onclick="pressSimon('blue')"></button>
+                    <button class="simon-btn simon-green" data-color="green" onclick="pressSimon('green')"></button>
+                    <button class="simon-btn simon-yellow" data-color="yellow" onclick="pressSimon('yellow')"></button>
+                </div>
+                <button class="simon-start-btn" id="simon-start-btn" onclick="startSimon()">▶ Start</button>
+                <div class="game-over-overlay" id="simon-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title">Simon Says</div>
+                        <div class="game-over-score" id="simon-result-round"></div>
+                        <button class="game-over-btn" onclick="restartSimon()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sudoku -->
+            <div id="sudoku-game" class="game-area hidden">
+                <h2>🔢 Sudoku</h2>
+                <div class="sdk-toolbar">
+                    <button class="sdk-diff-btn active" data-diff="easy" onclick="setSudokuDiff('easy')">Easy</button>
+                    <button class="sdk-diff-btn" data-diff="medium" onclick="setSudokuDiff('medium')">Medium</button>
+                    <button class="sdk-diff-btn" data-diff="hard" onclick="setSudokuDiff('hard')">Hard</button>
+                    <span class="sdk-info">⏱ <b id="sdk-time">0:00</b> &nbsp; ❌ <b id="sdk-mistakes">0</b>/5</span>
+                </div>
+                <div class="sdk-grid" id="sdk-grid"></div>
+                <div class="sdk-numpad">
+                    <button onclick="placeNumber(1)">1</button><button onclick="placeNumber(2)">2</button>
+                    <button onclick="placeNumber(3)">3</button><button onclick="placeNumber(4)">4</button>
+                    <button onclick="placeNumber(5)">5</button><button onclick="placeNumber(6)">6</button>
+                    <button onclick="placeNumber(7)">7</button><button onclick="placeNumber(8)">8</button>
+                    <button onclick="placeNumber(9)">9</button><button onclick="placeNumber(0)">✕</button>
+                </div>
+                <div class="game-over-overlay" id="sdk-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="sdk-result">Solved!</div>
+                        <div class="game-over-score" id="sdk-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartSudoku()">New Puzzle</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chess -->
+            <div id="chess-game" class="game-area hidden">
+                <h2>♟️ Chess</h2>
+                <div class="chess-status-bar">
+                    <span id="chess-status">Your turn (White)</span>
+                </div>
+                <div class="chess-layout">
+                    <div class="chess-ranks">
+                        <span class="chess-rank-label"></span><span class="chess-rank-label"></span>
+                        <span class="chess-rank-label"></span><span class="chess-rank-label"></span>
+                        <span class="chess-rank-label"></span><span class="chess-rank-label"></span>
+                        <span class="chess-rank-label"></span><span class="chess-rank-label"></span>
+                    </div>
+                    <div class="chess-board" id="chess-board"></div>
+                </div>
+                <div class="chess-files">
+                    <span class="chess-file-label"></span><span class="chess-file-label"></span>
+                    <span class="chess-file-label"></span><span class="chess-file-label"></span>
+                    <span class="chess-file-label"></span><span class="chess-file-label"></span>
+                    <span class="chess-file-label"></span><span class="chess-file-label"></span>
+                </div>
+                <div class="game-over-overlay" id="chess-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="chess-result">Game Over</div>
+                        <div class="game-over-score" id="chess-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartChess()">New Game</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hangman -->
+            <div id="hangman-game" class="game-area hidden">
+                <h2>🔤 Hangman</h2>
+                <div class="hm-status">
+                    <span>Score: <b id="hm-score">0</b></span>
+                    <span>Streak: <b id="hm-streak">0</b></span>
+                    <span id="hm-category" class="hm-category">Category: -</span>
+                    <span>Errors: <b id="hm-errors">0/6</b></span>
+                </div>
+                <div class="hm-main">
+                    <canvas id="hm-canvas" width="200" height="220"></canvas>
+                    <div class="hm-right">
+                        <div class="hm-word" id="hm-word"></div>
+                        <div class="hm-msg" id="hm-msg"></div>
+                        <div class="hm-letters" id="hm-letters"></div>
+                    </div>
+                </div>
+                <div class="game-over-overlay" id="hm-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title">💀 Hanged!</div>
+                        <div class="game-over-score" id="hm-result-word"></div>
+                        <div class="game-over-sub" id="hm-result-score"></div>
+                        <button class="game-over-btn" onclick="restartHangman()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing Speed -->
+            <div id="typingspeed-game" class="game-area hidden">
+                <h2>⌨️ Typing Speed</h2>
+                <div class="ts-hud">
+                    <span>WPM: <b id="ts-wpm">0</b></span>
+                    <span>Accuracy: <b id="ts-accuracy">100%</b></span>
+                    <span>Time: <b id="ts-time">60</b>s</span>
+                </div>
+                <div class="ts-text-display" id="ts-text-display"></div>
+                <textarea id="ts-input" class="ts-input" placeholder="Start typing here..." oninput="onTypingInput(event)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+                <button class="ts-start-btn" id="ts-start-btn" onclick="startTyping()">▶ Start Test</button>
+                <div class="game-over-overlay" id="ts-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title">⌨️ Test Complete!</div>
+                        <div class="game-over-score" id="ts-result-wpm"></div>
+                        <div class="game-over-sub" id="ts-result-score"></div>
+                        <button class="game-over-btn" onclick="restartTyping()">Try Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Platformer -->
+            <div id="platformer-game" class="game-area hidden">
+                <h2>🏃 Platformer</h2>
+                <div class="pf-hud">
+                    <span>Score: <b id="pf-score">0</b></span>
+                    <span id="pf-lives">❤️❤️❤️</span>
+                </div>
+                <div class="pf-wrap">
+                    <canvas id="platformer-canvas"></canvas>
+                </div>
+                <div class="pf-mobile-controls">
+                    <button class="pf-btn" ontouchstart="pfKey('ArrowLeft',true)" ontouchend="pfKey('ArrowLeft',false)">◀</button>
+                    <button class="pf-btn pf-jump" ontouchstart="pfKey('ArrowUp',true)" ontouchend="pfKey('ArrowUp',false)">▲ JUMP</button>
+                    <button class="pf-btn" ontouchstart="pfKey('ArrowRight',true)" ontouchend="pfKey('ArrowRight',false)">▶</button>
+                </div>
+                <div class="game-over-overlay" id="pf-over" style="display:none;">
+                    <div class="game-over-box">
+                        <div class="game-over-title" id="pf-result">Game Over</div>
+                        <div class="game-over-score" id="pf-final-score">Score: 0</div>
+                        <button class="game-over-btn" onclick="restartPlatformer()">Play Again</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- 3D Car Racing -->
             <div id="car-racing-game" class="game-area hidden">
                 <div class="cr-header">
@@ -821,6 +1142,23 @@
 <script src="minesweeper.js"></script>
 <script src="memory-match.js"></script>
 <script src="breakout-game.js"></script>
+<script src="pong.js"></script>
+<script src="airhockey.js"></script>
+<script src="whackamole.js"></script>
+<script src="bubbleshooter.js"></script>
+<script src="simonsays.js"></script>
+<script src="sudoku.js"></script>
+<script src="chess.js"></script>
+<script src="hangman.js"></script>
+<script src="typingspeed.js"></script>
+<script src="platformer.js"></script>
+<script>
+function pfKey(code, down) {
+    if (window.initPlatformer && window.pf) { /* handled in platformer.js */ }
+    var e = new KeyboardEvent(down ? 'keydown' : 'keyup', { code: code, bubbles: true });
+    document.dispatchEvent(e);
+}
+</script>
 <script>
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

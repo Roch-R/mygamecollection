@@ -487,8 +487,18 @@ function startGame(game) {
             case 'blockblast':   initBlockBlast();   break;
             case 'game2048':     if(window.init2048) init2048(); break;
             case 'minesweeper':  if(window.initMinesweeper) initMinesweeper(); break;
-            case 'memorymatch':  if(window.initMemoryMatch) initMemoryMatch(); break;
-            case 'breakout':     if(window.initBreakout) { document.getElementById('breakout-over').style.display='none'; initBreakout(); } break;
+            case 'memorymatch':    if(window.initMemoryMatch) initMemoryMatch(); break;
+            case 'breakout':       if(window.initBreakout) { document.getElementById('breakout-over').style.display='none'; initBreakout(); } break;
+            case 'pong':           if(window.initPong) initPong(); break;
+            case 'airhockey':      if(window.initAirHockey) initAirHockey(); break;
+            case 'whackamole':     if(window.initWhackAMole) initWhackAMole(); break;
+            case 'bubbleshooter':  if(window.initBubbleShooter) initBubbleShooter(); break;
+            case 'simonsays':      if(window.initSimon) initSimon(); break;
+            case 'sudoku':         if(window.initSudoku) initSudoku(); break;
+            case 'chess':          if(window.initChess) initChess(); break;
+            case 'hangman':        if(window.initHangman) initHangman(); break;
+            case 'typingspeed':    if(window.initTypingSpeed) initTypingSpeed(); break;
+            case 'platformer':     if(window.initPlatformer) initPlatformer(); break;
         }
     }
 
@@ -594,6 +604,16 @@ function getGameName(game) {
         minesweeper:  'Minesweeper',
         memorymatch:  'Memory Match',
         breakout:     'Breakout',
+        pong:         'Pong',
+        airhockey:    'Air Hockey',
+        whackamole:   'Whack-a-Mole',
+        bubbleshooter:'Bubble Shooter',
+        simonsays:    'Simon Says',
+        sudoku:       'Sudoku',
+        chess:        'Chess',
+        hangman:      'Hangman',
+        typingspeed:  'Typing Speed',
+        platformer:   'Platformer',
     };
     return names[game] || game;
 }
