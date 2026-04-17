@@ -436,12 +436,6 @@
                                 <i class="fas fa-angles-down"></i><span class="tm-lbl">DROP!</span>
                             </button>
                         </div>
-                        <!-- Row 4: Hold -->
-                        <div class="tetris-mobile-row">
-                            <button class="tetris-ctrl-btn tetris-hold-btn tm-hold" onclick="tetrisMobileAction('hold')">
-                                <i class="fas fa-hand-holding"></i><span>HOLD</span>
-                            </button>
-                        </div>
                     </div>
                     <div class="tetris-board-wrapper">
                         <canvas id="tetris-canvas" width="300" height="600"></canvas>
@@ -451,16 +445,11 @@
                             <h4>Next</h4>
                             <canvas id="tetris-next-canvas" width="120" height="120"></canvas>
                         </div>
-                        <div class="tetris-hold-box">
-                            <h4>Hold</h4>
-                            <canvas id="tetris-hold-canvas" width="120" height="120"></canvas>
-                        </div>
                         <div class="tetris-info">
                             <p>↑ Rotate</p>
                             <p>← → Move</p>
                             <p>↓ Soft Drop</p>
                             <p>Space Hard Drop</p>
-                            <p>C Hold</p>
                             <p>P Pause</p>
                         </div>
                     </div>
@@ -481,9 +470,8 @@
                     <button class="tbb-btn" onclick="tetrisMobileAction('right')"><i class="fas fa-arrow-right"></i><span>RIGHT</span></button>
                     <button class="tbb-btn" onclick="tetrisMobileAction('rotate')"><i class="fas fa-redo"></i><span>SPIN R</span></button>
                 </div>
-                <!-- Row 2: Hold  Drop -->
+                <!-- Row 2: Drop only -->
                 <div class="tbb-row">
-                    <button class="tbb-btn tbb-hold" onclick="tetrisMobileAction('hold')"><i class="fas fa-hand-holding"></i><span>HOLD</span></button>
                     <button class="tbb-btn tbb-drop" onclick="tetrisMobileAction('hardDrop')"><i class="fas fa-angles-down"></i><span>DROP!</span></button>
                 </div>
             </div>
