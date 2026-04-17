@@ -11,7 +11,8 @@
         canvas: null, ctx: null, animId: null,
         grid: [], bubble: null, nextColor: null,
         angle: -Math.PI / 2, score: 0, level: 1,
-        running: false, started: false, _ctrlsSetup: false
+        running: false, started: false, _ctrlsSetup: false,
+        pops: []  // pop animations
     };
 
     function initBubbleShooter() {
@@ -19,7 +20,7 @@
         bs.canvas = document.getElementById('bubbleshooter-canvas');
         bs.ctx = bs.canvas.getContext('2d');
         bs.canvas.width = W; bs.canvas.height = H;
-        bs.score = 0; bs.level = 1; bs.running = false; bs.started = false;
+        bs.score = 0; bs.level = 1; bs.running = false; bs.started = false; bs.pops = [];
         document.getElementById('bs-score').textContent = '0';
         document.getElementById('bs-level').textContent = '1';
         document.getElementById('bs-over').style.display = 'none';
@@ -174,7 +175,11 @@
         // Check matches
         var matched = findMatches(bestR, bestC, bs.bubble.color);
         if (matched.length >= 3) {
-            matched.forEach(function(pos) { bs.grid[pos[0]][pos[1]] = null; });
+            matched.forEach(function(pos) {
+                var gp = gridPos(pos[0], pos[1]);
+                spawnPop(gp.x, gp.y, bs.grid[pos[0]][pos[1]]);
+                bs.grid[pos[0]][pos[1]] = null;
+            });
             bs.score += matched.length * 10 * bs.level;
             document.getElementById('bs-score').textContent = bs.score;
             removeFloating();
@@ -198,6 +203,27 @@
 
         newBubble();
         bs.bubble.moving = false;
+    }
+
+    function gridPos(r, c) {
+        var offset = r % 2 === 0 ? 0 : CELL / 2;
+        return { x: offset + c * CELL + CELL / 2, y: r * (CELL * 0.87) + CELL / 2 };
+    }
+
+    function spawnPop(x, y, color) {
+        var particles = [];
+        var NUM = 8;
+        for (var i = 0; i < NUM; i++) {
+            var angle = (i / NUM) * Math.PI * 2 + Math.random() * 0.4;
+            var speed = 2.5 + Math.random() * 2.5;
+            particles.push({
+                x: x, y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                r: 4 + Math.random() * 4
+            });
+        }
+        bs.pops.push({ x: x, y: y, color: color, life: 22, maxLife: 22, particles: particles });
     }
 
     function findMatches(r, c, color) {
@@ -248,7 +274,12 @@
         bs.grid.forEach(function(row, r) {
             if (!row) return;
             row.forEach(function(v, c) {
-                if (v && !connected[r + ',' + c]) { bs.grid[r][c] = null; bs.score += 5; }
+                if (v && !connected[r + ',' + c]) {
+                    var gp = gridPos(r, c);
+                    spawnPop(gp.x, gp.y, v);
+                    bs.grid[r][c] = null;
+                    bs.score += 5;
+                }
             });
         });
         document.getElementById('bs-score').textContent = bs.score;
@@ -270,6 +301,41 @@
                 drawBubble(c, gx, gy, bs.grid[r][col]);
             }
         }
+
+        // Pop animations
+        bs.pops = bs.pops.filter(function(pop) {
+            var t = 1 - pop.life / pop.maxLife;  // 0 → 1
+            var alpha = 1 - t;
+
+            // Expanding ring
+            c.save();
+            c.globalAlpha = alpha * 0.7;
+            c.strokeStyle = pop.color;
+            c.lineWidth = 3;
+            c.shadowColor = pop.color; c.shadowBlur = 10;
+            c.beginPath();
+            c.arc(pop.x, pop.y, (CELL / 2) * (0.8 + t * 1.4), 0, Math.PI * 2);
+            c.stroke();
+            c.shadowBlur = 0;
+
+            // Particles
+            pop.particles.forEach(function(p) {
+                c.globalAlpha = alpha;
+                c.fillStyle = pop.color;
+                c.shadowColor = pop.color; c.shadowBlur = 6;
+                c.beginPath();
+                c.arc(p.x, p.y, p.r * (1 - t * 0.6), 0, Math.PI * 2);
+                c.fill();
+                p.x += p.vx; p.y += p.vy;
+                p.vy += 0.18;  // slight gravity
+            });
+            c.shadowBlur = 0;
+            c.globalAlpha = 1;
+            c.restore();
+
+            pop.life--;
+            return pop.life > 0;
+        });
 
         // Aim line
         if (!bs.bubble.moving) {
