@@ -527,9 +527,11 @@ var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap', 'ugb-carr
 
 function showGameBar(game) {
     _ugbGame = game;
-    // Show EXIT button in navbar whenever a game is active
+    // Show EXIT button in navbar + hamburger menu whenever a game is active
     var navExit = document.getElementById('nav-exit-btn');
     if (navExit) navExit.style.display = '';
+    var menuExitLi = document.getElementById('nav-menu-exit-li');
+    if (menuExitLi) menuExitLi.style.display = '';
     var bar = document.getElementById('ugb');
     if (!bar) return;
     // Hide all panels
@@ -555,6 +557,8 @@ function hideGameBar() {
     _ugbGame = null;
     var navExit = document.getElementById('nav-exit-btn');
     if (navExit) navExit.style.display = 'none';
+    var menuExitLi = document.getElementById('nav-menu-exit-li');
+    if (menuExitLi) menuExitLi.style.display = 'none';
     var bar = document.getElementById('ugb');
     if (bar) bar.classList.remove('visible');
 }
