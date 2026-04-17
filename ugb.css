@@ -229,39 +229,3 @@
     letter-spacing: 0.1em;
 }
 
-/* ── EXIT BUTTON ── */
-.ugb-exit-btn {
-    position: absolute;
-    top: 8px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 6px 12px;
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.35), rgba(180, 30, 45, 0.28));
-    border: 1.5px solid rgba(220, 53, 69, 0.75);
-    border-radius: 20px;
-    color: #ff8a95;
-    font-family: "Press Start 2P", monospace;
-    font-size: 0.55rem;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    touch-action: manipulation;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    outline: none;
-    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-    z-index: 10;
-}
-
-.ugb-exit-btn:active {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.75), rgba(180, 30, 45, 0.65));
-    border-color: #dc3545;
-    color: #fff;
-    transform: scale(0.93);
-    box-shadow: 0 0 16px rgba(220, 53, 69, 0.6);
-}
-
-.ugb-exit-btn i {
-    font-size: 0.75rem;
-}

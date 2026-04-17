@@ -41,6 +41,9 @@
             <a href="#home" class="nav-logo">
                 <i class="fas fa-gamepad"></i> GameZone
             </a>
+            <button class="nav-exit-btn" id="nav-exit-btn" onclick="closeGame()" style="display:none;" aria-label="Exit game">
+                <i class="fas fa-times"></i> EXIT
+            </button>
             <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
                 <i class="fas fa-bars"></i>
             </button>
@@ -1109,11 +1112,6 @@
 
     <!-- Universal Game Control Bar (mobile popup for all games) -->
     <div id="ugb" class="ugb">
-
-        <!-- Exit button: always visible in the UGB bar on mobile -->
-        <button class="ugb-exit-btn" onclick="closeGame()" aria-label="Exit game">
-            <i class="fas fa-times"></i> EXIT
-        </button>
 
         <!-- D-pad: snake, pacman, 1945 shooter -->
         <div class="ugb-panel" id="ugb-dpad">
