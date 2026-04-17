@@ -33,6 +33,7 @@
         }, 1000);
     }
     window.initSudoku = initSudoku;
+    window._stopSudoku = function() { if (sdk.timer) { clearInterval(sdk.timer); sdk.timer = null; } sdk.running = false; };
 
     function generatePuzzle(removeCount) {
         // Start with solved board using backtracking

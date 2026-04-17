@@ -21,6 +21,7 @@
         setButtonsEnabled(false);
     }
     window.initSimon = initSimon;
+    window._stopSimon = function() { simon.running = false; simon.accepting = false; };
 
     function startSimon() {
         simon.sequence = []; simon.playerSeq = []; simon.round = 0;

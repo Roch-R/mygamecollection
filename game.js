@@ -616,17 +616,14 @@ function closeGame() {
 }
 
 function stopAllGames() {
-    // Stop music first — most important, music keeps playing even after loop stops
-    if (typeof stopShooterMusic === 'function') stopShooterMusic();
-    if (typeof stopFlappyMusic  === 'function') stopFlappyMusic();
-    if (typeof stopFlappyAmbient === 'function') stopFlappyAmbient();
+    // ── Audio: stop all game-specific sounds first ──
+    if (typeof stopShooterMusic        === 'function') stopShooterMusic();
+    if (typeof stopSkyjumpBackgroundMusic === 'function') stopSkyjumpBackgroundMusic();
+    if (typeof closeSkyjumpAudio       === 'function') closeSkyjumpAudio();
+    if (typeof stopEngineSound         === 'function') stopEngineSound();
 
-    // Flappy
-    const flappyState = window.flappyState || {};
-    if (flappyState.gameLoop) {
-        cancelAnimationFrame(flappyState.gameLoop);
-        flappyState.gameLoop = null;
-    }
+    // Flappy — cleanup stops all Audio elements + animation loop
+    if (typeof window.flappyCleanup === 'function') window.flappyCleanup();
     const flappyOverlay = document.querySelector('.flappy-gameover');
     if (flappyOverlay) flappyOverlay.remove();
 
@@ -642,7 +639,19 @@ function stopAllGames() {
         racingState.countdownTimer = null;
     }
 
-    // Other games
+    // Canvas / rAF games
+    if (typeof window._stopPong          === 'function') window._stopPong();
+    if (typeof window._stopAirHockey     === 'function') window._stopAirHockey();
+    if (typeof window._stopBubbleShooter === 'function') window._stopBubbleShooter();
+    if (typeof window._stopPlatformer    === 'function') window._stopPlatformer();
+
+    // Timer-based games
+    if (typeof window._stopWhackAMole   === 'function') window._stopWhackAMole();
+    if (typeof window._stopTypingSpeed  === 'function') window._stopTypingSpeed();
+    if (typeof window._stopSudoku       === 'function') window._stopSudoku();
+    if (typeof window._stopSimon        === 'function') window._stopSimon();
+
+    // Core games
     if (gameState.clicker.autoInterval)  { clearInterval(gameState.clicker.autoInterval);  gameState.clicker.autoInterval = null; }
     if (gameState.memory.timer)          { clearInterval(gameState.memory.timer);           gameState.memory.timer = null; }
     if (gameState.snake.gameLoop)        { clearInterval(gameState.snake.gameLoop);         gameState.snake.gameLoop = null; gameState.snake.isRunning = false; }
@@ -665,7 +674,7 @@ function stopAllGames() {
         if (el) el.remove();
     });
 
-    // Stop any music
+    // Global music/tones
     stopGameBackgroundMusic();
 }
 

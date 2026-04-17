@@ -31,6 +31,7 @@
         });
     }
     window.initWhackAMole = initWhackAMole;
+    window._stopWhackAMole = function() { clearAllTimers(); wam.running = false; };
 
     function clearAllTimers() {
         if (wam.gameTimer) { clearInterval(wam.gameTimer); wam.gameTimer = null; }

@@ -31,6 +31,7 @@
         drawStart();
     }
     window.initAirHockey = initAirHockey;
+    window._stopAirHockey = function() { if (ah.animId) { cancelAnimationFrame(ah.animId); ah.animId = null; } ah.running = false; };
 
     function resetPuck(dir) {
         ah.puckX = W / 2; ah.puckY = H / 2;

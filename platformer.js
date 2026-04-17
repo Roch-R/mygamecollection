@@ -28,6 +28,7 @@
         drawStart();
     }
     window.initPlatformer = initPlatformer;
+    window._stopPlatformer = function() { if (pf.animId) { cancelAnimationFrame(pf.animId); pf.animId = null; } pf.running = false; };
 
     function buildLevel() {
         pf.cameraX = 0;

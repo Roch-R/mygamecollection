@@ -30,6 +30,7 @@
         drawStart();
     }
     window.initBubbleShooter = initBubbleShooter;
+    window._stopBubbleShooter = function() { if (bs.animId) { cancelAnimationFrame(bs.animId); bs.animId = null; } bs.running = false; };
 
     function buildGrid() {
         bs.grid = [];

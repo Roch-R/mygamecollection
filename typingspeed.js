@@ -35,6 +35,7 @@
         document.getElementById('ts-start-btn').style.display = '';
     }
     window.initTypingSpeed = initTypingSpeed;
+    window._stopTypingSpeed = function() { if (ts.timer) { clearInterval(ts.timer); ts.timer = null; } ts.running = false; };
 
     function pickPassage() {
         ts.text = PASSAGES[Math.floor(Math.random() * PASSAGES.length)];

@@ -791,7 +791,7 @@ function stopEngineSound() {
         if (_engineGain && _racingAudioCtx) {
             _engineGain.gain.linearRampToValueAtTime(0, _racingAudioCtx.currentTime + 0.3);
         }
-        if (_engineOsc) { setTimeout(() => { try { _engineOsc.stop(); } catch(e){} _engineOsc = null; }, 350); }
+        if (_engineOsc) { try { _engineOsc.stop(); } catch(e){} _engineOsc = null; }
     } catch(e) {}
     _engineFilter = null; _engineGain = null;
 }

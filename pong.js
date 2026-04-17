@@ -27,6 +27,7 @@
         drawStart();
     }
     window.initPong = initPong;
+    window._stopPong = function() { if (pong.animId) { cancelAnimationFrame(pong.animId); pong.animId = null; } pong.running = false; };
 
     function resetBall() {
         pong.ballX = W / 2; pong.ballY = H / 2;
