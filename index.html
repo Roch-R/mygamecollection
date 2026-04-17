@@ -4,8 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GameZone - Play & Win</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GameZone">
+    <!-- SEO -->
+    <meta name="description" content="Play 12+ free HTML5 games — Tetris, Pacman, Flappy Bird, Snake, Block Blast, Car Racing and more. No download needed!">
+    <meta name="keywords" content="free games, tetris, pacman, flappy bird, snake, html5 games, browser games, gamezone">
+    <meta name="author" content="GameZone">
+    <!-- Open Graph (WhatsApp, Discord, Facebook preview) -->
+    <meta property="og:title" content="GameZone - Play & Win">
+    <meta property="og:description" content="Play 12+ free HTML5 games in your browser. No download needed!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://roch-r.github.io/mygamecollection/">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/0a0a1a/667eea?text=GameZone+Play+%26+Win">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GameZone - Play & Win">
+    <meta name="twitter:description" content="Play 12+ free HTML5 games in your browser!">
+    <meta name="twitter:image" content="https://via.placeholder.com/1200x630/0a0a1a/667eea?text=GameZone+Play+%26+Win">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="game.css">
+    <link rel="stylesheet" href="game.css">
     <link rel="stylesheet" href="flappy.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -24,6 +47,11 @@
                 <li><a href="#home" class="nav-link" onclick="closeGame()">Home</a></li>
                 <li><a href="#games" class="nav-link" onclick="closeGame()">Games</a></li>
                 <li><a href="#scores" class="nav-link" onclick="closeGame()">Scores</a></li>
+                <li>
+                    <button class="theme-btn" id="theme-btn" onclick="cycleTheme()" title="Change Theme">
+                        <i class="fas fa-palette"></i> <span id="theme-label">Dark</span>
+                    </button>
+                </li>
             </ul>
         </div>
 </nav>
@@ -43,76 +71,125 @@
         <h2 class="section-title">Choose Your Game</h2>
         <div class="games-grid">
             <div class="game-card" data-game="clicker">
+                <span class="card-badge badge-easy">Easy</span>
                 <div class="game-icon"><i class="fas fa-hand-pointer"></i></div>
                 <h3>Clicker Hero</h3>
                 <p>Click to earn points and unlock upgrades!</p>
                 <button class="play-btn" onclick="startGame('clicker')">Play Now</button>
             </div>
             <div class="game-card" data-game="memory">
+                <span class="card-badge badge-easy">Easy</span>
                 <div class="game-icon"><i class="fas fa-brain"></i></div>
                 <h3>Memory Match</h3>
                 <p>Find all matching pairs!</p>
                 <button class="play-btn" onclick="startGame('memory')">Play Now</button>
             </div>
             <div class="game-card" data-game="rps">
+                <span class="card-badge badge-easy">Easy</span>
                 <div class="game-icon"><i class="fas fa-hand-rock"></i></div>
                 <h3>Rock Paper Scissors</h3>
                 <p>Beat the computer!</p>
                 <button class="play-btn" onclick="startGame('rps')">Play Now</button>
             </div>
             <div class="game-card" data-game="snake">
+                <span class="card-badge badge-medium">Medium</span>
                 <div class="game-icon"><i class="fas fa-dragon"></i></div>
                 <h3>Snake Adventure</h3>
                 <p>Eat food, grow longer, don't hit walls!</p>
                 <button class="play-btn" onclick="startGame('snake')">Play Now</button>
             </div>
             <div class="game-card" data-game="flappy">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-hot">🔥 Hot</span>
                 <div class="game-icon"><i class="fas fa-dove"></i></div>
                 <h3>Flappy Bird</h3>
                 <p>Tap to fly through the pipes!</p>
                 <button class="play-btn" onclick="startGame('flappy')">Play Now</button>
             </div>
             <div class="game-card" data-game="tetris">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-hot">🔥 Hot</span>
                 <div class="game-icon"><i class="fas fa-th-large"></i></div>
                 <h3>Tetris</h3>
                 <p>Stack blocks, clear lines, beat your high score!</p>
                 <button class="play-btn" onclick="startGame('tetris')">Play Now</button>
             </div>
             <div class="game-card" data-game="blockblast">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
                 <div class="game-icon"><i class="fas fa-th"></i></div>
                 <h3>Block Blast</h3>
                 <p>Match blocks smartly to clear the board!</p>
                 <button class="play-btn" onclick="startGame('blockblast')">Play Now</button>
             </div>
             <div class="game-card" data-game="shooter1945">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-hot">🔥 Hot</span>
                 <div class="game-icon"><i class="fas fa-fighter-jet"></i></div>
                 <h3>1945 Shooter</h3>
                 <p>Shoot enemies, collect power-ups, defeat bosses!</p>
                 <button class="play-btn" onclick="startGame('shooter1945')">Play Now</button>
             </div>
             <div class="game-card" data-game="skyjump">
+                <span class="card-badge badge-medium">Medium</span>
                 <div class="game-icon"><i class="fas fa-rocket"></i></div>
                 <h3>Sky Jump</h3>
                 <p>Jump from ground to galaxy! Tap to jump higher!</p>
                 <button class="play-btn" onclick="startGame('skyjump')">Play Now</button>
             </div>
             <div class="game-card" data-game="wordsearch">
+                <span class="card-badge badge-easy">Easy</span>
                 <div class="game-icon"><i class="fas fa-font"></i></div>
                 <h3>Word Search</h3>
                 <p>Find hidden words in the grid! 3 difficulties, 30 chapters!</p>
                 <button class="play-btn" onclick="startGame('wordsearch')">Play Now</button>
             </div>
             <div class="game-card" data-game="pacman">
+                <span class="card-badge badge-medium">Medium</span>
                 <div class="game-icon"><i class="fas fa-ghost"></i></div>
                 <h3>Pacman</h3>
                 <p>Eat all dots, avoid ghosts! 3 levels: Easy, Medium, Hard!</p>
                 <button class="play-btn" onclick="startGame('pacman')">Play Now</button>
             </div>
             <div class="game-card" data-game="carracing">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-new">✨ New</span>
                 <div class="game-icon">🚗</div>
                 <h3>3D Car Racing</h3>
                 <p>Race 3 laps against AI cars! WASD or touch controls.</p>
                 <button class="play-btn" onclick="startGame('carracing')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="game2048">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🔢</div>
+                <h3>2048</h3>
+                <p>Slide tiles, merge numbers, reach 2048!</p>
+                <button class="play-btn" onclick="startGame('game2048')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="minesweeper">
+                <span class="card-badge badge-hard">Hard</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">💣</div>
+                <h3>Minesweeper</h3>
+                <p>Find all mines without triggering them!</p>
+                <button class="play-btn" onclick="startGame('minesweeper')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="memorymatch">
+                <span class="card-badge badge-easy">Easy</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🃏</div>
+                <h3>Memory Match</h3>
+                <p>Flip cards and find matching pairs before time runs out!</p>
+                <button class="play-btn" onclick="startGame('memorymatch')">Play Now</button>
+            </div>
+            <div class="game-card" data-game="breakout">
+                <span class="card-badge badge-medium">Medium</span>
+                <span class="card-label label-new">✨ New</span>
+                <div class="game-icon">🧱</div>
+                <h3>Breakout</h3>
+                <p>Bounce the ball, smash all the bricks. 5 levels of mayhem!</p>
+                <button class="play-btn" onclick="startGame('breakout')">Play Now</button>
             </div>
         </div>
     </section>
@@ -251,6 +328,41 @@
                     <span>Best: <span id="tetris-high">0</span></span>
                 </div>
                 <div class="tetris-layout">
+                    <div class="tetris-mobile-controls" id="tetris-mobile-controls" style="display:none;">
+                        <!-- Row 1: Spin Left + Spin Right -->
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn tm-spin" onclick="tetrisMobileAction('rotateLeft')">
+                                <i class="fas fa-undo"></i><span class="tm-lbl">SPIN L</span>
+                            </button>
+                            <button class="tetris-ctrl-btn tm-spin" onclick="tetrisMobileAction('rotate')">
+                                <i class="fas fa-redo"></i><span class="tm-lbl">SPIN R</span>
+                            </button>
+                        </div>
+                        <!-- Row 2: Left + Right -->
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn tm-move" onclick="tetrisMobileAction('left')">
+                                <i class="fas fa-arrow-left"></i><span class="tm-lbl">LEFT</span>
+                            </button>
+                            <button class="tetris-ctrl-btn tm-move" onclick="tetrisMobileAction('right')">
+                                <i class="fas fa-arrow-right"></i><span class="tm-lbl">RIGHT</span>
+                            </button>
+                        </div>
+                        <!-- Row 3: Soft Down + Hard Drop -->
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn tm-move" onclick="tetrisMobileAction('down')">
+                                <i class="fas fa-arrow-down"></i><span class="tm-lbl">DOWN</span>
+                            </button>
+                            <button class="tetris-ctrl-btn tm-harddrop" onclick="tetrisMobileAction('hardDrop')">
+                                <i class="fas fa-angles-down"></i><span class="tm-lbl">DROP!</span>
+                            </button>
+                        </div>
+                        <!-- Row 4: Hold -->
+                        <div class="tetris-mobile-row">
+                            <button class="tetris-ctrl-btn tetris-hold-btn tm-hold" onclick="tetrisMobileAction('hold')">
+                                <i class="fas fa-hand-holding"></i><span>HOLD</span>
+                            </button>
+                        </div>
+                    </div>
                     <div class="tetris-board-wrapper">
                         <canvas id="tetris-canvas" width="300" height="600"></canvas>
                     </div>
@@ -276,20 +388,134 @@
                 <div class="tetris-controls">
                     <button class="tetris-start-btn" id="tetris-start-btn" onclick="startTetris()" type="button">Start Game</button>
                     <button class="tetris-pause-btn" id="tetris-pause-btn" onclick="togglePauseTetris()" type="button" style="display:none;">Pause</button>
-                    <div class="tetris-mobile-controls" id="tetris-mobile-controls" style="display:none;">
-                        <div class="tetris-mobile-row">
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('rotateLeft')"><i class="fas fa-undo"></i></button>
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('hardDrop')"><i class="fas fa-angles-down"></i></button>
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('rotate')"><i class="fas fa-redo"></i></button>
+                </div>
+            </div>
+
+            <!-- Tetris fixed bottom control bar -->
+            <div class="tetris-bottom-bar" id="tetris-bottom-bar">
+                <!-- Row 1: Spin-L  Left  Down  Right  Spin-R -->
+                <div class="tbb-row">
+                    <button class="tbb-btn" onclick="tetrisMobileAction('rotateLeft')"><i class="fas fa-undo"></i><span>SPIN L</span></button>
+                    <button class="tbb-btn" onclick="tetrisMobileAction('left')"><i class="fas fa-arrow-left"></i><span>LEFT</span></button>
+                    <button class="tbb-btn" onclick="tetrisMobileAction('down')"><i class="fas fa-arrow-down"></i><span>DOWN</span></button>
+                    <button class="tbb-btn" onclick="tetrisMobileAction('right')"><i class="fas fa-arrow-right"></i><span>RIGHT</span></button>
+                    <button class="tbb-btn" onclick="tetrisMobileAction('rotate')"><i class="fas fa-redo"></i><span>SPIN R</span></button>
+                </div>
+                <!-- Row 2: Hold  Drop -->
+                <div class="tbb-row">
+                    <button class="tbb-btn tbb-hold" onclick="tetrisMobileAction('hold')"><i class="fas fa-hand-holding"></i><span>HOLD</span></button>
+                    <button class="tbb-btn tbb-drop" onclick="tetrisMobileAction('hardDrop')"><i class="fas fa-angles-down"></i><span>DROP!</span></button>
+                </div>
+            </div>
+
+            <!-- Minesweeper -->
+            <div id="minesweeper-game" class="game-area hidden">
+                <h2>💣 Minesweeper</h2>
+                <div class="ms-toolbar">
+                    <button class="ms-diff-btn active" data-diff="easy"   onclick="initMinesweeper('easy')">Easy</button>
+                    <button class="ms-diff-btn"         data-diff="medium" onclick="initMinesweeper('medium')">Medium</button>
+                    <button class="ms-diff-btn"         data-diff="hard"   onclick="initMinesweeper('hard')">Hard</button>
+                </div>
+                <div class="ms-status">
+                    <span>💣 <span id="ms-mines">10</span></span>
+                    <button class="ms-face" id="ms-face" onclick="initMinesweeper()">🙂</button>
+                    <span>⏱ <span id="ms-timer">0</span>s</span>
+                </div>
+                <div class="ms-scroll">
+                    <div class="ms-wrap">
+                        <div id="ms-grid" class="ms-grid"></div>
+                        <div id="ms-over" class="g2048-over" style="display:none;">
+                            <div class="g2048-over-box">
+                                <h3 id="ms-result">💥 Game Over!</h3>
+                                <button class="tetris-start-btn" onclick="initMinesweeper()">Try Again</button>
+                            </div>
                         </div>
-                        <div class="tetris-mobile-row">
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('left')"><i class="fas fa-arrow-left"></i></button>
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('down')"><i class="fas fa-arrow-down"></i></button>
-                            <button class="tetris-ctrl-btn" onclick="tetrisMobileAction('right')"><i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+                <p style="text-align:center;opacity:0.5;font-size:0.75rem;margin-top:10px;">Left click = reveal · Right click / Long press = flag</p>
+            </div>
+
+            <!-- Memory Match -->
+            <div id="memorymatch-game" class="game-area hidden">
+                <h2>🃏 Memory Match</h2>
+                <div class="mm-toolbar">
+                    <button class="mm-diff-btn active" data-diff="easy"   onclick="initMemoryMatch('easy')">Easy (4×4)</button>
+                    <button class="mm-diff-btn"         data-diff="medium" onclick="initMemoryMatch('medium')">Medium (5×4)</button>
+                    <button class="mm-diff-btn"         data-diff="hard"   onclick="initMemoryMatch('hard')">Hard (6×4)</button>
+                </div>
+                <div class="mm-status">
+                    <span>🔄 Moves: <strong id="mm-moves">0</strong></span>
+                    <button class="mm-restart-btn" onclick="initMemoryMatch()">↺ Restart</button>
+                    <span>⏱ <strong id="mm-timer">0s</strong></span>
+                </div>
+                <div class="mm-wrap">
+                    <div id="mm-grid" class="mm-grid"></div>
+                    <div id="mm-over" class="g2048-over" style="display:none;">
+                        <div class="g2048-over-box">
+                            <h3 id="mm-result-msg">🎉 You won!</h3>
+                            <p id="mm-result-score">Score: 0</p>
+                            <button class="tetris-start-btn" onclick="initMemoryMatch()">Play Again</button>
                         </div>
-                        <div class="tetris-mobile-row">
-                            <button class="tetris-ctrl-btn tetris-hold-btn" onclick="tetrisMobileAction('hold')"><i class="fas fa-hand-holding"></i> Hold</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breakout -->
+            <div id="breakout-game" class="game-area hidden">
+                <h2>🧱 Breakout</h2>
+                <div class="bo-hud">
+                    <span>Score: <strong id="bo-score">0</strong></span>
+                    <span>Level: <strong id="bo-level">1</strong></span>
+                    <span id="bo-lives">❤️❤️❤️</span>
+                </div>
+                <div id="breakout-wrap" class="bo-wrap">
+                    <canvas id="breakout-canvas"></canvas>
+                    <div id="breakout-over" class="g2048-over" style="display:none;">
+                        <div class="g2048-over-box">
+                            <h3 id="bo-result-msg">💥 Game Over!</h3>
+                            <p id="bo-result-score">Score: 0</p>
+                            <button class="tetris-start-btn" onclick="restartBreakout()">Play Again</button>
                         </div>
+                    </div>
+                </div>
+                <p style="text-align:center;opacity:0.5;font-size:0.75rem;margin-top:8px;">Arrow Keys / Mouse / Touch to move paddle · Space to launch</p>
+                <div class="bo-legend">
+                    <span style="color:#00eeff">■ W = Wide paddle</span>
+                    <span style="color:#aaffaa">■ S = Slow ball</span>
+                    <span style="color:#ff88aa">■ + = Extra life</span>
+                </div>
+            </div>
+
+            <!-- 2048 Game -->
+            <div id="game2048-game" class="game-area hidden">
+                <h2>2048</h2>
+                <div class="g2048-header">
+                    <div class="g2048-stat"><span class="g2048-lbl">SCORE</span><span id="g2048-score">0</span></div>
+                    <div class="g2048-stat"><span class="g2048-lbl">BEST</span><span id="g2048-best">0</span></div>
+                </div>
+                <p style="text-align:center;opacity:0.6;margin-bottom:12px;font-size:0.85rem;">Use arrow keys or swipe to move tiles</p>
+                <div class="g2048-wrap">
+                    <div id="g2048-grid" class="g2048-grid"></div>
+                    <div id="g2048-over" class="g2048-over" style="display:none;">
+                        <div class="g2048-over-box">
+                            <h3>Game Over!</h3>
+                            <p>Score: <strong id="g2048-final">0</strong></p>
+                            <button class="tetris-start-btn" onclick="init2048()">Play Again</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tetris-controls" style="margin-top:16px;">
+                    <button class="tetris-start-btn" onclick="init2048()">New Game</button>
+                </div>
+                <!-- Mobile arrow buttons -->
+                <div class="g2048-arrows">
+                    <div class="g2048-arrow-row">
+                        <button class="g2048-btn" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp'}))">▲</button>
+                    </div>
+                    <div class="g2048-arrow-row">
+                        <button class="g2048-btn" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft'}))">◀</button>
+                        <button class="g2048-btn" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowDown'}))">▼</button>
+                        <button class="g2048-btn" onclick="document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight'}))">▶</button>
                     </div>
                 </div>
             </div>
@@ -547,8 +773,11 @@
                             <button class="car-btn car-left" ontouchstart="racingState.touchControls.left=true" ontouchend="racingState.touchControls.left=false">◀</button>
                             <button class="car-btn car-right" ontouchstart="racingState.touchControls.right=true" ontouchend="racingState.touchControls.right=false">▶</button>
                         </div>
+                        <div class="car-nitro-row">
+                            <button class="car-btn car-nitro" ontouchstart="racingState.touchControls.nitro=true" ontouchend="racingState.touchControls.nitro=false">⚡ NITRO</button>
+                        </div>
                     </div>
-                    <p class="car-racing-instructions">🎮 WASD / Arrow Keys · Touch buttons on mobile</p>
+                    <p class="car-racing-instructions">🎮 WASD / Arrow Keys · Shift=Nitro · C=Camera · Touch buttons on mobile</p>
                 </div>
             </div>
         </div>
@@ -561,6 +790,9 @@
             <div class="leaderboard-card">
                 <h3><i class="fas fa-trophy"></i> Top Scores</h3>
                 <ul id="top-scores"></ul>
+                <button class="share-score-btn" onclick="shareScore()">
+                    <i class="fas fa-share-alt"></i> Share My Score
+                </button>
             </div>
         </div>
     </section>
@@ -570,7 +802,7 @@
         <p>&copy; 2026 GameZone. All rights reserved. <i class="fas fa-gamepad"></i></p>
     </footer>
 <script src="game.js"></script>
-<script src="three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="clickergame.js"></script>
 <script src="memorygame.js"></script>
 <script src="rockpaperscissors.js"></script>
@@ -584,5 +816,17 @@
 <script src="flappy-game.js"></script>
 <script src="blockblast-game.js"></script>
 <script src="car-racing-game.js"></script>
+<script src="achievements.js"></script>
+<script src="game2048.js"></script>
+<script src="minesweeper.js"></script>
+<script src="memory-match.js"></script>
+<script src="breakout-game.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+</script>
 </body>
 </html>

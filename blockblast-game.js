@@ -275,8 +275,16 @@ function buildUI() {
 
     const availW=Math.min(window.innerWidth-40,500);
     const isMobile=window.innerWidth<600;
-    if (isMobile) { CS=Math.max(28,Math.min(44,Math.floor((availW-20-GAP*(GRID-1))/GRID))); GAP=3; PAD=8; }
-    else          { CS=46; GAP=3; PAD=10; }
+    if (isMobile) {
+        GAP=3; PAD=8;
+        // Board capped at 48% of viewport height so the other 52%
+        // always covers header + tray + all padding without needing scroll.
+        const maxFromW=Math.min(window.innerWidth*0.88, availW-10);
+        const maxFromH=Math.max(200, window.innerHeight*0.48);
+        const maxSize=Math.min(maxFromW, maxFromH);
+        CS=Math.max(22,Math.min(40,Math.floor((maxSize-GAP*(GRID-1)-PAD*2)/GRID)));
+    }
+    else { CS=46; GAP=3; PAD=10; }
 
     wrap.style.cssText=[
         'display:flex',isMobile?'flex-direction:column':'flex-direction:row',

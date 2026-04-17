@@ -183,17 +183,9 @@
         });
     }
 
-    /* ── Voice Announcements (Web Speech API) ── */
-    function _voice(text, pitch, rate) {
-        if (!window.speechSynthesis) return;
-        try {
-            window.speechSynthesis.cancel();
-            var u = new SpeechSynthesisUtterance(text);
-            u.pitch  = (pitch !== undefined) ? pitch : 1.0;
-            u.rate   = (rate  !== undefined) ? rate  : 1.1;
-            u.volume = 0.95;
-            window.speechSynthesis.speak(u);
-        } catch(e) {}
+    /* ── Voice Announcements disabled ── */
+    function _voice() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
     }
 
     /* ─────────────────────────────────────────
@@ -257,6 +249,13 @@
 
         grabCanvases(st);
         if (!st.canvas) return;
+
+        /* Show bottom control bar on mobile */
+        if (window.innerWidth <= 768) {
+            var bar = document.getElementById('tetris-bottom-bar');
+            if (bar) bar.classList.add('visible');
+        }
+
         resizeCanvas(st);
 
         /* Fresh board */
@@ -275,8 +274,6 @@
 
         var pb = document.getElementById('tetris-pause-btn');
         if (pb) { pb.textContent='Pause'; pb.classList.remove('paused'); }
-
-        if (window.innerWidth <= 768) showEl('tetris-mobile-controls','flex');
 
         clearHoldCanvas(st);
 
@@ -792,7 +789,9 @@
         var sb=document.getElementById('tetris-start-btn');
         if (sb) sb.textContent='Play Again';
         showEl('tetris-pause-btn','none');
-        showEl('tetris-mobile-controls','none');
+        /* Hide bottom control bar on game over */
+        var bar2 = document.getElementById('tetris-bottom-bar');
+        if (bar2) bar2.classList.remove('visible');
 
         setTimeout(function(){ showGameOverOverlay(st,best); },300);
 
@@ -902,9 +901,9 @@
 
     function resizeCanvas(st) {
         if (!st.canvas) return;
-        var isMobile = window.innerWidth <= 600;
+        var isMobile = window.innerWidth <= 768;
         var maxW = isMobile
-            ? Math.min(window.innerWidth - 20, 360)
+            ? Math.min(window.innerWidth - 20, 340)
             : Math.min(300, window.innerWidth - 200);
         var maxH = window.innerHeight * (isMobile ? 0.60 : 0.75);
         var byCols = Math.floor(maxW / st.cols);
@@ -983,3 +982,12 @@
     }
 
 })();
+
+/* ── Tetris control popup toggle (global) ── */
+function toggleTetrisCtrl() {
+    var popup = document.getElementById('tetris-ctrl-popup');
+    var fab   = document.getElementById('tetris-ctrl-fab');
+    if (!popup) return;
+    var isOpen = popup.classList.toggle('open');
+    if (fab) fab.textContent = isOpen ? '✕' : '🎮';
+}

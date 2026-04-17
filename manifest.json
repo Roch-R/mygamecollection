@@ -1,0 +1,32 @@
+{
+  "name": "GameZone - Play & Win",
+  "short_name": "GameZone",
+  "description": "Play 12+ free HTML5 games — Tetris, Pacman, Flappy Bird, Snake, and more!",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#667eea",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/667eea/ffffff?text=GZ",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512/667eea/ffffff?text=GZ",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/390x844/0a0a1a/667eea?text=GameZone",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ]
+}

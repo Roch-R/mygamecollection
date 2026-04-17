@@ -17,17 +17,38 @@ window.racingState = {
     lap: 1, totalLaps: 3, lapProgress: 0, lastProgress: 0,
     position: 1, lapTime: 0, bestLap: null, raceFinished: false,
     raceStarted: false, countdown: 3, countdownTimer: null, startTime: 0, lapStartTime: 0,
-    keys: {}, touchControls: { accel: false, brake: false, left: false, right: false },
+    keys: {}, touchControls: { accel: false, brake: false, left: false, right: false, nitro: false },
     roadMeshes: [], barrierMeshes: [], treeMeshes: [], ground: null,
     ambientLight: null, dirLight: null,
     checkpoints: [], passedCheckpoints: new Set(),
     exhaustParticles: [],
     _keyDown: null, _keyUp: null,
+    // Upgrades
+    difficulty: 'medium',
+    playerColor: 0xFF2222,
+    nitro: 0, nitroActive: false, nitroTimer: 0,
+    NITRO_MAX: 15000, NITRO_DURATION: 2000, NITRO_BOOST: 1.4,
+    cameraMode: 0,
+    _mmBounds: null,
 };
 
 // 4 lanes spaced 5 units apart inside a 20-unit-wide track
 // Car body = 1.8 wide → 3.2 units of clear air between any two adjacent cars
 const RACING_LANES = [-7.5, -2.5, 2.5, 7.5];
+
+const DIFFICULTY_CONFIG = {
+    easy:   { aiMult: 0.75, rubberband: false, brakeEarly: true  },
+    medium: { aiMult: 1.00, rubberband: false, brakeEarly: false },
+    hard:   { aiMult: 1.20, rubberband: true,  brakeEarly: false },
+};
+
+const CAR_COLOR_OPTIONS = [
+    { hex: 0xFF2222, css: '#ff2222', label: 'Red'    },
+    { hex: 0x2255FF, css: '#2255ff', label: 'Blue'   },
+    { hex: 0x22CC44, css: '#22cc44', label: 'Green'  },
+    { hex: 0xFF8800, css: '#ff8800', label: 'Orange' },
+    { hex: 0xEEEEEE, css: '#eeeeee', label: 'White'  },
+];
 
 // ============================================
 // INIT
@@ -46,11 +67,12 @@ function initCarRacing() {
         isRunning: false, isPaused: false, isGameOver: false, raceFinished: false,
         raceStarted: false, countdown: 3, lap: 1, lapProgress: 0, lastProgress: 0,
         position: 1, lapTime: 0, bestLap: null, initialized: false,
-        keys: {}, touchControls: { accel: false, brake: false, left: false, right: false },
+        keys: {}, touchControls: { accel: false, brake: false, left: false, right: false, nitro: false },
         passedCheckpoints: new Set(),
         aiCars: [], trackSegments: [], trackCurve: [], roadMeshes: [],
         barrierMeshes: [], treeMeshes: [], checkpoints: [],
         playerSpeed: 0, playerAngle: 0, playerPos: { x: 0, z: 0 },
+        nitro: 0, nitroActive: false, nitroTimer: 0, cameraMode: 0, _mmBounds: null,
     });
     requestAnimationFrame(() => { setTimeout(() => _initCarRacingInternal(), 100); });
 }
@@ -92,10 +114,45 @@ function _initCarRacingInternal() {
     buildEnvironment();
     buildCrowd();
     buildBillboards();
-    buildAllCars();
     buildLights();
     setupRacingControls();
     updateRacingUI();
+
+    // ── Speedometer HUD ──
+    if (!document.getElementById('cr-speedometer')) {
+        const spd = document.createElement('div'); spd.id = 'cr-speedometer';
+        spd.innerHTML = `<span id="cr-spd-val">0</span><span class="cr-spd-unit">KM/H</span>`;
+        wrapper.appendChild(spd);
+    }
+
+    // ── Nitro bar ──
+    if (!document.getElementById('cr-nitro-bar-wrap')) {
+        const nb = document.createElement('div'); nb.id = 'cr-nitro-bar-wrap';
+        nb.innerHTML = `<div class="cr-nitro-label">⚡ NITRO</div><div id="cr-nitro-track"><div id="cr-nitro-fill"></div></div>`;
+        wrapper.appendChild(nb);
+    }
+
+    // ── Mini-map ──
+    if (!document.getElementById('cr-minimap')) {
+        const mm = document.createElement('canvas');
+        mm.id = 'cr-minimap'; mm.width = 120; mm.height = 120;
+        wrapper.appendChild(mm);
+        // Cache track bounding box
+        let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+        state.trackCurve.forEach(p => {
+            if(p.x<minX)minX=p.x; if(p.x>maxX)maxX=p.x;
+            if(p.z<minZ)minZ=p.z; if(p.z>maxZ)maxZ=p.z;
+        });
+        state._mmBounds = {minX,maxX,minZ,maxZ};
+    }
+
+    // ── Camera label ──
+    if (!document.getElementById('cr-cam-label')) {
+        const cl = document.createElement('div'); cl.id = 'cr-cam-label';
+        cl.textContent = 'FOLLOW';
+        wrapper.appendChild(cl);
+    }
+
     state.initialized = true;
 
     state.camera.position.set(0, 120, 0);
@@ -460,17 +517,21 @@ function buildAllCars() {
 
     // Player — front-left
     const p = gridPos(RACING_LANES[0], 0);
-    state.playerCar = createCarMesh(0xFF2222, 0xCC0000);
+    const pc = state.playerColor || 0xFF2222;
+    const dc = Math.floor(pc * 0.75);
+    state.playerCar = createCarMesh(pc, dc);
     state.playerCar.position.set(p.x, 0.35, p.z);
     state.playerCar.rotation.y = seg0.angle;
     state.playerAngle = seg0.angle;
     state.playerPos   = { x: p.x, z: p.z };
     state.scene.add(state.playerCar);
 
+    const diff = DIFFICULTY_CONFIG[state.difficulty] || DIFFICULTY_CONFIG.medium;
+    const aiMult = diff.aiMult;
     const aiDefs = [
-        { color: [0x2255FF, 0x0033CC], laneIdx: 3, row: 0,   speed: 0.255 }, // Blue  — fastest, pole
-        { color: [0x22CC44, 0x009922], laneIdx: 1, row: ROW, speed: 0.238 }, // Green — mid
-        { color: [0xFFAA00, 0xFF7700], laneIdx: 2, row: ROW, speed: 0.245 }, // Yellow— aggressive
+        { color: [0x2255FF, 0x0033CC], laneIdx: 3, row: 0,   speed: 0.255 * aiMult }, // Blue  — fastest, pole
+        { color: [0x22CC44, 0x009922], laneIdx: 1, row: ROW, speed: 0.238 * aiMult }, // Green — mid
+        { color: [0xFFAA00, 0xFF7700], laneIdx: 2, row: ROW, speed: 0.245 * aiMult }, // Yellow— aggressive
     ];
 
     aiDefs.forEach(def => {
@@ -661,8 +722,11 @@ function setupRacingControls() {
     if (state._keyDown) document.removeEventListener('keydown', state._keyDown);
     if (state._keyUp)   document.removeEventListener('keyup',   state._keyUp);
     state._keyDown = (e) => {
-        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyS','KeyA','KeyD'].includes(e.code)) e.preventDefault();
+        if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyS','KeyA','KeyD','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault();
         state.keys[e.code] = true;
+        if (e.code === 'KeyC' || e.code === 'KeyV') {
+            state.cameraMode = ((state.cameraMode || 0) + 1) % 3;
+        }
     };
     state._keyUp = (e) => { state.keys[e.code] = false; };
     document.addEventListener('keydown', state._keyDown);
@@ -777,6 +841,19 @@ function playLapSound() {
     });
 }
 
+function playNitroSound() {
+    const ctx = getRacingAudioCtx(); if (!ctx) return;
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(320, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.35);
+    gain.gain.setValueAtTime(0.09, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.35);
+}
+
 function playFinishSound() {
     const ctx = getRacingAudioCtx(); if (!ctx) return;
     const melody = [523, 659, 784, 1047, 1319];
@@ -803,6 +880,13 @@ function startCarRacing() {
     if (state.isRunning)    return;
     const startOv = document.getElementById('car-start-overlay');
     if (startOv) startOv.remove();
+
+    // Rebuild cars with current difficulty + color
+    if (state.playerCar) {
+        state.scene.remove(state.playerCar); state.playerCar = null;
+        state.aiCars.forEach(ai => state.scene.remove(ai.mesh)); state.aiCars = [];
+    }
+    buildAllCars();
     state.isRunning   = true;
     state.raceStarted = false;
     state.countdown   = 3;
@@ -843,6 +927,7 @@ function racingGameLoop() {
         updateRaceProgress();
         updateRacingHUD();
         updateExhaust();
+        updateMinimap();
         updateEngineSound(state.playerSpeed, state.playerMaxSpeed);
     }
     updateCamera();
@@ -861,7 +946,19 @@ function updatePlayerCar() {
     const left  = k['ArrowLeft']  || k['KeyA'] || tc.left;
     const right = k['ArrowRight'] || k['KeyD'] || tc.right;
 
-    if (accel)      state.playerSpeed = Math.min(state.playerSpeed + state.playerAccel, state.playerMaxSpeed);
+    // ── Nitro system ──
+    if (!state.nitroActive) state.nitro = Math.min(1, state.nitro + 16 / state.NITRO_MAX);
+    if ((k['ShiftLeft'] || k['ShiftRight'] || tc.nitro) && state.nitro >= 0.15 && !state.nitroActive) {
+        state.nitroActive = true; state.nitroTimer = state.NITRO_DURATION; playNitroSound();
+    }
+    if (state.nitroActive) {
+        state.nitroTimer -= 16;
+        state.nitro = Math.max(0, state.nitro - 16 / state.NITRO_DURATION);
+        if (state.nitroTimer <= 0 || state.nitro <= 0) state.nitroActive = false;
+    }
+    const effectiveMaxSpeed = state.nitroActive ? state.playerMaxSpeed * state.NITRO_BOOST : state.playerMaxSpeed;
+
+    if (accel)      state.playerSpeed = Math.min(state.playerSpeed + state.playerAccel, effectiveMaxSpeed);
     else if (brake) state.playerSpeed = Math.max(state.playerSpeed - state.playerBrake, -state.playerMaxSpeed*0.4);
     else {
         if      (state.playerSpeed > 0) state.playerSpeed = Math.max(0, state.playerSpeed - state.playerFriction);
@@ -980,7 +1077,8 @@ function updateAICars() {
             if (diff > Math.PI) diff = Math.PI * 2 - diff;
             if (diff > maxCurv) maxCurv = diff;
         }
-        const cornerMult = Math.max(0.80, 1 - maxCurv * 2.5);
+        const brakeAdjust = (DIFFICULTY_CONFIG[state.difficulty] || DIFFICULTY_CONFIG.medium).brakeEarly ? 1.5 : 1.0;
+        const cornerMult = Math.max(0.80, 1 - maxCurv * 2.5 * brakeAdjust);
 
         // ── Following distance — slow down, never stop
         const aiX = seg.x + (next.x - seg.x) * ai.segProgress + seg.perpX * ai.currentLane;
@@ -1022,7 +1120,12 @@ function updateAICars() {
         });
 
         // ── Advance along track
-        const effectiveSpeed = ai.speed * cornerMult * followMult;
+        let rbMult = 1.0;
+        if ((DIFFICULTY_CONFIG[state.difficulty] || DIFFICULTY_CONFIG.medium).rubberband) {
+            const playerTotal = (state.lap - 1) + state.lastProgress;
+            if (playerTotal - ai.totalProgress > 0.5) rbMult = 1.15;
+        }
+        const effectiveSpeed = ai.speed * cornerMult * followMult * rbMult;
         ai.segProgress += effectiveSpeed / seg.len;
         if (ai.segProgress >= 1) {
             ai.segProgress = 0;
@@ -1152,20 +1255,44 @@ function resolveCarCollisions() {
 function updateCamera() {
     const state = window.racingState;
     if (!state.playerCar || !state.camera) return;
-    // Lower, closer, wider — feels like real racing
-    const speedBias = state.playerSpeed / state.playerMaxSpeed;
-    const camDist = 8.5 + speedBias * 1.5;  // pull back slightly at high speed
-    const camH    = 3.2 + speedBias * 0.8;
-    const tx = state.playerCar.position.x - Math.sin(state.playerAngle) * camDist;
-    const ty = state.playerCar.position.y + camH;
-    const tz = state.playerCar.position.z - Math.cos(state.playerAngle) * camDist;
-    state.camera.position.x += (tx - state.camera.position.x) * 0.12;
-    state.camera.position.y += (ty - state.camera.position.y) * 0.12;
-    state.camera.position.z += (tz - state.camera.position.z) * 0.12;
-    // Look slightly ahead of the car
-    const lookAheadX = state.playerCar.position.x + Math.sin(state.playerAngle) * 3;
-    const lookAheadZ = state.playerCar.position.z + Math.cos(state.playerAngle) * 3;
-    state.camera.lookAt(lookAheadX, state.playerCar.position.y + 0.6, lookAheadZ);
+    const mode = state.cameraMode || 0;
+
+    if (mode === 0) {
+        // Follow cam
+        const speedBias = state.playerSpeed / state.playerMaxSpeed;
+        const camDist = 8.5 + speedBias * 1.5;
+        const camH    = 3.2 + speedBias * 0.8;
+        const tx = state.playerCar.position.x - Math.sin(state.playerAngle) * camDist;
+        const ty = state.playerCar.position.y + camH;
+        const tz = state.playerCar.position.z - Math.cos(state.playerAngle) * camDist;
+        state.camera.position.x += (tx - state.camera.position.x) * 0.12;
+        state.camera.position.y += (ty - state.camera.position.y) * 0.12;
+        state.camera.position.z += (tz - state.camera.position.z) * 0.12;
+        const lookAheadX = state.playerCar.position.x + Math.sin(state.playerAngle) * 3;
+        const lookAheadZ = state.playerCar.position.z + Math.cos(state.playerAngle) * 3;
+        state.camera.lookAt(lookAheadX, state.playerCar.position.y + 0.6, lookAheadZ);
+    } else if (mode === 1) {
+        // Hood cam
+        const hoodX = state.playerCar.position.x + Math.sin(state.playerAngle) * 1.0;
+        const hoodZ = state.playerCar.position.z + Math.cos(state.playerAngle) * 1.0;
+        state.camera.position.set(hoodX, state.playerCar.position.y + 1.0, hoodZ);
+        const lookX = state.playerCar.position.x + Math.sin(state.playerAngle) * 20;
+        const lookZ = state.playerCar.position.z + Math.cos(state.playerAngle) * 20;
+        state.camera.lookAt(lookX, state.playerCar.position.y + 0.8, lookZ);
+    } else {
+        // TV cam — high fixed point above start, tracks player
+        if (state.trackSegments.length) {
+            const s0 = state.trackSegments[0];
+            state.camera.position.x += (s0.x - state.camera.position.x) * 0.02;
+            state.camera.position.y += (120 - state.camera.position.y) * 0.02;
+            state.camera.position.z += (s0.z - state.camera.position.z) * 0.02;
+        }
+        state.camera.lookAt(state.playerCar.position.x, state.playerCar.position.y, state.playerCar.position.z);
+    }
+
+    const camNames = ['FOLLOW','HOOD','TV'];
+    const cl = document.getElementById('cr-cam-label');
+    if (cl) cl.textContent = camNames[mode] || 'FOLLOW';
 }
 
 // ============================================
@@ -1196,7 +1323,9 @@ function updateExhaust() {
 
     // Limit total particles
     if (state.exhaustParticles.length < 60) {
-        spawnPuff(state.playerPos.x, state.playerPos.z, state.playerAngle, state.playerSpeed, 0x999999);
+        const exhaustColor = state.nitroActive
+            ? (Math.random() > 0.5 ? 0x4488FF : 0xFF6600) : 0x999999;
+        spawnPuff(state.playerPos.x, state.playerPos.z, state.playerAngle, state.playerSpeed, exhaustColor);
         state.aiCars.forEach(ai => {
             const seg = state.trackSegments[ai.segIdx]; if (!seg) return;
             spawnPuff(ai.mesh.position.x, ai.mesh.position.z, seg.angle, ai.speed, 0xaaaaaa);
@@ -1226,6 +1355,21 @@ function updateRacingHUD() {
     const state = window.racingState;
     const el = document.getElementById('car-lap-time');
     if (el) el.textContent = state.lapTime.toFixed(1);
+
+    // Speedometer
+    const spdVal = document.getElementById('cr-spd-val');
+    if (spdVal) {
+        const kmh = Math.round(Math.abs(state.playerSpeed) * 846);
+        spdVal.textContent = kmh;
+        spdVal.style.color = kmh > 160 ? '#ff4444' : kmh > 100 ? '#FFD700' : '#ffffff';
+    }
+
+    // Nitro bar
+    const fill = document.getElementById('cr-nitro-fill');
+    if (fill) {
+        fill.style.width = (state.nitro * 100) + '%';
+        fill.className = state.nitroActive ? 'active' : '';
+    }
 }
 
 function updateRacingUI() {
@@ -1316,6 +1460,63 @@ function closeCarFinish() {
 }
 
 // ============================================
+// MINI-MAP
+// ============================================
+
+function updateMinimap() {
+    const state = window.racingState;
+    const mm = document.getElementById('cr-minimap'); if (!mm) return;
+    const ctx = mm.getContext('2d'); if (!ctx) return;
+    const W = mm.width, H = mm.height;
+    const b = state._mmBounds; if (!b) return;
+    const pad = 8;
+    const scaleX = (W - pad*2) / (b.maxX - b.minX || 1);
+    const scaleZ = (H - pad*2) / (b.maxZ - b.minZ || 1);
+    const toX = wx => pad + (wx - b.minX) * scaleX;
+    const toY = wz => pad + (wz - b.minZ) * scaleZ;
+
+    ctx.clearRect(0, 0, W, H);
+
+    // Circular clip
+    ctx.save();
+    ctx.beginPath(); ctx.arc(W/2, H/2, W/2 - 1, 0, Math.PI*2); ctx.clip();
+
+    // Background
+    ctx.fillStyle = 'rgba(0,0,0,0.75)'; ctx.fillRect(0,0,W,H);
+
+    // Track outline
+    if (state.trackCurve.length) {
+        ctx.beginPath();
+        ctx.moveTo(toX(state.trackCurve[0].x), toY(state.trackCurve[0].z));
+        state.trackCurve.forEach(p => ctx.lineTo(toX(p.x), toY(p.z)));
+        ctx.closePath();
+        ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 4; ctx.stroke();
+    }
+
+    // AI car dots
+    const aiColors = ['#4488ff','#22cc44','#ffaa00'];
+    state.aiCars.forEach((ai, i) => {
+        ctx.beginPath();
+        ctx.arc(toX(ai.mesh.position.x), toY(ai.mesh.position.z), 4, 0, Math.PI*2);
+        ctx.fillStyle = aiColors[i] || '#fff'; ctx.fill();
+    });
+
+    // Player dot
+    if (state.playerPos) {
+        ctx.beginPath();
+        ctx.arc(toX(state.playerPos.x), toY(state.playerPos.z), 5, 0, Math.PI*2);
+        ctx.fillStyle = '#ff2222'; ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+
+    ctx.restore();
+
+    // Border ring
+    ctx.beginPath(); ctx.arc(W/2, H/2, W/2 - 1, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 2; ctx.stroke();
+}
+
+// ============================================
 // START SCREEN
 // ============================================
 
@@ -1329,12 +1530,35 @@ function drawRacingStartScreen() {
         ov.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.65);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;color:#fff;text-align:center;border-radius:8px;`;
         wrapper.appendChild(ov);
     }
+    const st = window.racingState;
+    const diffBtns = ['easy','medium','hard'].map(d => {
+        const active = st.difficulty === d;
+        const labels = {easy:'😊 Easy',medium:'😤 Medium',hard:'💀 Hard'};
+        return `<button onclick="setRacingDifficulty('${d}')" style="padding:7px 14px;border:2px solid ${active?'#FFD700':'rgba(255,255,255,0.3)'};background:${active?'rgba(255,215,0,0.2)':'rgba(255,255,255,0.08)'};color:${active?'#FFD700':'#fff'};border-radius:8px;cursor:pointer;font-size:0.85rem;font-weight:${active?'700':'400'};transition:all 0.2s;">${labels[d]}</button>`;
+    }).join('');
+
+    const colorCircles = CAR_COLOR_OPTIONS.map(c => {
+        const sel = st.playerColor === c.hex;
+        return `<div onclick="setRacingCarColor(${c.hex})" title="${c.label}" style="width:28px;height:28px;border-radius:50%;background:${c.css};cursor:pointer;border:${sel?'3px solid #fff':'2px solid rgba(255,255,255,0.3)'};box-shadow:${sel?'0 0 8px rgba(255,255,255,0.8)':'none'};transform:${sel?'scale(1.2)':'scale(1)'};transition:all 0.2s;"></div>`;
+    }).join('');
+
     ov.innerHTML = `
         <div style="font-size:3.2rem;">🏎️</div>
         <h2 style="font-size:1.9rem;color:#FFD700;margin:8px 0;">3D Car Racing</h2>
         <p style="opacity:0.9;margin:4px 0;">Race 3 laps &bull; Beat 3 AI cars</p>
-        <p style="font-size:0.88rem;opacity:0.65;margin:4px 0;">WASD / Arrow Keys &bull; Touch buttons below</p>
-        <button onclick="closeCarStartAndBegin()" style="margin-top:18px;padding:13px 36px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:1.1rem;cursor:pointer;font-weight:700;box-shadow:0 4px 20px rgba(102,126,234,0.5);">
+        <p style="font-size:0.82rem;opacity:0.6;margin:2px 0;">WASD / Arrows &bull; Shift=Nitro &bull; C=Camera</p>
+
+        <div style="margin:12px 0 6px;">
+            <p style="font-size:0.8rem;opacity:0.7;margin:0 0 6px;">DIFFICULTY</p>
+            <div style="display:flex;gap:8px;justify-content:center;">${diffBtns}</div>
+        </div>
+
+        <div style="margin:10px 0 6px;">
+            <p style="font-size:0.8rem;opacity:0.7;margin:0 0 6px;">CAR COLOR</p>
+            <div style="display:flex;gap:10px;justify-content:center;align-items:center;">${colorCircles}</div>
+        </div>
+
+        <button onclick="closeCarStartAndBegin()" style="margin-top:14px;padding:13px 36px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:10px;font-size:1.1rem;cursor:pointer;font-weight:700;box-shadow:0 4px 20px rgba(102,126,234,0.5);">
             🏁 Start Race
         </button>`;
 }
@@ -1342,6 +1566,16 @@ function drawRacingStartScreen() {
 function closeCarStartAndBegin() {
     const ov = document.getElementById('car-start-overlay'); if (ov) ov.remove();
     startCarRacing();
+}
+
+function setRacingDifficulty(level) {
+    window.racingState.difficulty = level;
+    drawRacingStartScreen();
+}
+
+function setRacingCarColor(hexColor) {
+    window.racingState.playerColor = hexColor;
+    drawRacingStartScreen();
 }
 
 // ============================================
@@ -1371,12 +1605,68 @@ function injectRacingCSS() {
             35%  { transform:translate(-50%,-50%) scale(1);   opacity:1; }
             100% { transform:translate(-50%,-50%) scale(1);   opacity:1; }
         }
+        @keyframes nitroPulse {
+            0%,100% { box-shadow:0 0 8px #0088ff; }
+            50%     { box-shadow:0 0 18px #00eeff, 0 0 32px #ff8800; }
+        }
         .car-racing-canvas-wrapper {
             position:relative !important; display:flex;
             justify-content:center; align-items:center;
             background:#000; border-radius:10px; overflow:hidden; width:100%;
         }
         #car-racing-canvas { display:block; max-width:100%; }
+
+        /* Speedometer */
+        #cr-speedometer {
+            position:absolute; bottom:10px; right:136px;
+            background:rgba(0,0,0,0.65); border-radius:10px;
+            padding:6px 10px; text-align:center; color:#fff;
+            font-family:monospace; pointer-events:none;
+            border:1px solid rgba(255,255,255,0.2);
+        }
+        #cr-spd-val { font-size:1.6rem; font-weight:700; display:block; line-height:1; }
+        .cr-spd-unit { font-size:0.65rem; opacity:0.7; letter-spacing:1px; }
+
+        /* Nitro bar */
+        #cr-nitro-bar-wrap {
+            position:absolute; bottom:10px; left:10px;
+            width:120px; pointer-events:none;
+        }
+        .cr-nitro-label {
+            font-size:0.7rem; color:#00ccff; font-weight:700;
+            letter-spacing:1px; margin-bottom:3px; font-family:monospace;
+        }
+        #cr-nitro-track {
+            height:8px; background:rgba(255,255,255,0.15);
+            border-radius:4px; overflow:hidden;
+            border:1px solid rgba(0,200,255,0.4);
+        }
+        #cr-nitro-fill {
+            height:100%; width:0%; border-radius:4px;
+            background:linear-gradient(90deg,#0055ff,#00eeff);
+            transition:width 0.1s linear;
+        }
+        #cr-nitro-fill.active {
+            background:linear-gradient(90deg,#ff6600,#ffcc00);
+            animation:nitroPulse 0.3s infinite;
+        }
+
+        /* Mini-map */
+        #cr-minimap {
+            position:absolute; bottom:10px; right:10px;
+            width:120px; height:120px; border-radius:50%;
+            border:2px solid rgba(255,255,255,0.35);
+            pointer-events:none;
+        }
+
+        /* Camera label */
+        #cr-cam-label {
+            position:absolute; top:10px; left:10px;
+            background:rgba(0,0,0,0.55); color:#FFD700;
+            font-size:0.7rem; font-weight:700; font-family:monospace;
+            letter-spacing:2px; padding:4px 8px; border-radius:6px;
+            border:1px solid rgba(255,215,0,0.3); pointer-events:none;
+        }
     `;
     document.head.appendChild(s);
 }

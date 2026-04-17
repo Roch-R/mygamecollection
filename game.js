@@ -3,6 +3,61 @@
    ALL 5 GAMES WITH FLAPPY BIRD FEATURES
    ============================================ */
 
+/* ── Theme switcher ── */
+const THEMES = [
+    { cls: '',            label: 'Dark'  },
+    { cls: 'theme-neon',  label: 'Neon'  },
+    { cls: 'theme-retro', label: 'Retro' }
+];
+let _themeIdx = parseInt(localStorage.getItem('gz-theme') || '0');
+(function applyTheme() {
+    document.body.className = document.body.className.replace(/theme-\S+/g, '').trim();
+    if (THEMES[_themeIdx].cls) document.body.classList.add(THEMES[_themeIdx].cls);
+    const lbl = document.getElementById('theme-label');
+    if (lbl) lbl.textContent = THEMES[_themeIdx].label;
+})();
+/* ── Share Score ── */
+function shareScore() {
+    var scores = [];
+    try { scores = JSON.parse(localStorage.getItem('gameScores') || '[]'); } catch(e) {}
+    var best = scores.slice(0,3).map(function(s){ return s.game + ': ' + s.score; }).join(', ');
+    var text = best ? 'My best scores on GameZone 🎮 — ' + best + '! Can you beat me? Play free at ' : 'Play 12+ free games on GameZone 🎮 ';
+    var url = 'https://roch-r.github.io/mygamecollection/';
+    if (navigator.share) {
+        navigator.share({ title: 'GameZone - Play & Win', text: text, url: url }).catch(function(){});
+    } else {
+        var ta = document.createElement('textarea');
+        ta.value = text + url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        if (window._toast) _toast('Link copied to clipboard!', 'success');
+        else alert('Copied: ' + url);
+    }
+}
+
+function cycleTheme() {
+    _themeIdx = (_themeIdx + 1) % THEMES.length;
+    localStorage.setItem('gz-theme', _themeIdx);
+    document.body.className = document.body.className.replace(/theme-\S+/g, '').trim();
+    if (THEMES[_themeIdx].cls) document.body.classList.add(THEMES[_themeIdx].cls);
+    const lbl = document.getElementById('theme-label');
+    if (lbl) lbl.textContent = THEMES[_themeIdx].label;
+}
+
+/* ── Haptic feedback helper ── */
+function haptic(ms) {
+    try { if (navigator.vibrate) navigator.vibrate(ms || 18); } catch(e) {}
+}
+/* Auto-attach haptic to all game buttons on touch */
+document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('touchstart', function(e) {
+        var t = e.target.closest('button, .play-btn, .tbb-btn, .tcp-btn, .tetris-ctrl-btn, .car-btn');
+        if (t) haptic(15);
+    }, {passive: true});
+});
+
 // ============================================
 // GLOBAL VARIABLES & STATE
 // ============================================
@@ -394,9 +449,13 @@ function startGame(game) {
     stopAllGames();  // always stop any running game before starting a new one
     initGameAudio();
     gameState.currentGame = game;
+    if (window.GZAch) GZAch.recordGame(game, 0);
 
     document.getElementById('game-arena').classList.add('active');
     document.querySelectorAll('.game-area').forEach(area => area.classList.add('hidden'));
+    document.body.classList.add('game-active');
+    const footer = document.querySelector('.sticky-footer');
+    if (footer) footer.style.display = 'none';
 
     const divId = GAME_DIV_ID_MAP[game] || `${game}-game`;
     const gameDiv = document.getElementById(divId);
@@ -425,11 +484,22 @@ function startGame(game) {
             case 'skyjump':     initSkyjump();      break;
             case 'wordsearch':  initWordSearch();   break;
             case 'pacman':      initPacman();       break;
-            case 'blockblast':  initBlockBlast();   break;
+            case 'blockblast':   initBlockBlast();   break;
+            case 'game2048':     if(window.init2048) init2048(); break;
+            case 'minesweeper':  if(window.initMinesweeper) initMinesweeper(); break;
+            case 'memorymatch':  if(window.initMemoryMatch) initMemoryMatch(); break;
+            case 'breakout':     if(window.initBreakout) { document.getElementById('breakout-over').style.display='none'; initBreakout(); } break;
         }
     }
 
     showToast(`Starting ${getGameName(game)}!`, 'info');
+}
+
+function restartBreakout() {
+    if (window.initBreakout) {
+        document.getElementById('breakout-over').style.display = 'none';
+        initBreakout();
+    }
 }
 
 function closeGame() {
@@ -444,6 +514,12 @@ function closeGame() {
     gameState.currentGame = null;
     document.getElementById('game-arena').classList.remove('active');
     document.querySelectorAll('.game-area').forEach(area => area.classList.add('hidden'));
+    document.body.classList.remove('game-active');
+    const footer = document.querySelector('.sticky-footer');
+    if (footer) footer.style.display = '';
+    /* Hide tetris bottom bar when leaving game */
+    var tbar = document.getElementById('tetris-bottom-bar');
+    if (tbar) tbar.classList.remove('visible');
 }
 
 function stopAllGames() {
@@ -512,8 +588,12 @@ function getGameName(game) {
         skyjump:     'Sky Jump',
         wordsearch:  'Word Search',
         pacman:      'Pacman',
-        blockblast:  'Block Blast',
-        carracing:   '3D Car Racing',
+        blockblast:   'Block Blast',
+        carracing:    '3D Car Racing',
+        game2048:     '2048',
+        minesweeper:  'Minesweeper',
+        memorymatch:  'Memory Match',
+        breakout:     'Breakout',
     };
     return names[game] || game;
 }
