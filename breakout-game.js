@@ -140,13 +140,10 @@
         var W = bo.canvas.width, H = bo.canvas.height;
         var p = bo.paddle, b = bo.ball;
 
-        // Paddle movement
-        if (bo.touchX !== null) {
-            p.x += (bo.touchX - p.w/2 - p.x) * 0.28;
-        } else {
-            if (bo.keys['ArrowLeft']  || bo.keys['KeyA']) p.x -= p.speed;
-            if (bo.keys['ArrowRight'] || bo.keys['KeyD']) p.x += p.speed;
-        }
+        // Paddle movement — keys take priority over touch position
+        if (bo.keys['ArrowLeft']  || bo.keys['KeyA']) { p.x -= p.speed; bo.touchX = null; }
+        else if (bo.keys['ArrowRight'] || bo.keys['KeyD']) { p.x += p.speed; bo.touchX = null; }
+        else if (bo.touchX !== null) { p.x += (bo.touchX - p.w/2 - p.x) * 0.28; }
         p.x = Math.max(0, Math.min(W - p.w, p.x));
 
         if (b.stuck) { b.x = p.x + p.w/2; b.y = p.y - b.r - 1; return; }

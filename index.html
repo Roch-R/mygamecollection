@@ -28,6 +28,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="ugb.css">
     <link rel="stylesheet" href="game.css">
     <link rel="stylesheet" href="flappy.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1106,6 +1107,46 @@
         </div>
     </section>
 </main>
+
+    <!-- Universal Game Control Bar (mobile popup for all games) -->
+    <div id="ugb" class="ugb">
+
+        <!-- D-pad: snake, pacman, 1945 shooter -->
+        <div class="ugb-panel" id="ugb-dpad">
+            <div class="ugb-dpad-wrap">
+                <div class="ugb-dpad-grid">
+                    <div></div>
+                    <button class="ugb-key" ontouchstart="ugbDir('up',true);event.preventDefault()" ontouchend="ugbDir('up',false)" onmousedown="ugbDir('up',true)" onmouseup="ugbDir('up',false)">▲</button>
+                    <div></div>
+                    <button class="ugb-key" ontouchstart="ugbDir('left',true);event.preventDefault()" ontouchend="ugbDir('left',false)" onmousedown="ugbDir('left',true)" onmouseup="ugbDir('left',false)">◀</button>
+                    <div class="ugb-dpad-center"></div>
+                    <button class="ugb-key" ontouchstart="ugbDir('right',true);event.preventDefault()" ontouchend="ugbDir('right',false)" onmousedown="ugbDir('right',true)" onmouseup="ugbDir('right',false)">▶</button>
+                    <div></div>
+                    <button class="ugb-key" ontouchstart="ugbDir('down',true);event.preventDefault()" ontouchend="ugbDir('down',false)" onmousedown="ugbDir('down',true)" onmouseup="ugbDir('down',false)">▼</button>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform: left / jump / right -->
+        <div class="ugb-panel ugb-hidden" id="ugb-platform">
+            <button class="ugb-key ugb-wide" ontouchstart="ugbDir('left',true);event.preventDefault()" ontouchend="ugbDir('left',false)" onmousedown="ugbDir('left',true)" onmouseup="ugbDir('left',false)">◀</button>
+            <button class="ugb-key ugb-wide ugb-jump" ontouchstart="ugbDir('jump',true);event.preventDefault()" ontouchend="ugbDir('jump',false)" onmousedown="ugbDir('jump',true)" onmouseup="ugbDir('jump',false)">▲ JUMP</button>
+            <button class="ugb-key ugb-wide" ontouchstart="ugbDir('right',true);event.preventDefault()" ontouchend="ugbDir('right',false)" onmousedown="ugbDir('right',true)" onmouseup="ugbDir('right',false)">▶</button>
+        </div>
+
+        <!-- LR: breakout -->
+        <div class="ugb-panel ugb-hidden" id="ugb-lr">
+            <button class="ugb-key ugb-wide" ontouchstart="ugbDir('left',true);event.preventDefault()" ontouchend="ugbDir('left',false)" onmousedown="ugbDir('left',true)" onmouseup="ugbDir('left',false)">◀ LEFT</button>
+            <button class="ugb-key ugb-wide ugb-accent" ontouchstart="ugbDir('right',true);event.preventDefault()" ontouchend="ugbDir('right',false)" onmousedown="ugbDir('right',true)" onmouseup="ugbDir('right',false)">RIGHT ▶</button>
+        </div>
+
+        <!-- Tap: flappy, skyjump -->
+        <div class="ugb-panel ugb-hidden" id="ugb-tap">
+            <button class="ugb-key ugb-huge" ontouchstart="ugbDir('tap',true);event.preventDefault()" ontouchend="ugbDir('tap',false)" onmousedown="ugbDir('tap',true)" onmouseup="ugbDir('tap',false)">▲ &nbsp; TAP &nbsp; ▲</button>
+        </div>
+
+    </div>
 
     <footer class="sticky-footer">
         <p>&copy; 2026 GameZone. All rights reserved. <i class="fas fa-gamepad"></i></p>

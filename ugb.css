@@ -1,0 +1,135 @@
+/* ============================================
+   UNIVERSAL GAME BAR (UGB) — mobile popup controls
+   Follows the same pattern as tetris-bottom-bar
+   ============================================ */
+
+.ugb {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: rgba(8, 8, 22, 0.97);
+    border-top: 2px solid rgba(102, 126, 234, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 10px 12px 14px;
+    touch-action: manipulation;
+    user-select: none;
+}
+
+@media (max-width: 768px) {
+    .ugb.visible { display: block; }
+
+    /* Push arena content up so bar doesn't cover game */
+    body.game-active .game-arena.active { padding-bottom: 150px !important; }
+}
+
+/* Hide a panel */
+.ugb-hidden { display: none !important; }
+
+/* Panel: row of controls */
+.ugb-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ── D-PAD ── */
+.ugb-dpad-wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.ugb-dpad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60px);
+    grid-template-rows: repeat(3, 54px);
+    gap: 5px;
+}
+
+.ugb-dpad-center {
+    background: rgba(102,126,234,0.12);
+    border-radius: 8px;
+    border: 1px solid rgba(102,126,234,0.2);
+}
+
+/* ── BASE BUTTON ── */
+.ugb-key {
+    background: linear-gradient(145deg, rgba(102,126,234,0.28), rgba(118,75,162,0.22));
+    border: 2px solid rgba(102,126,234,0.65);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s, transform 0.08s;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+.ugb-key:active,
+.ugb-key.pressed {
+    background: linear-gradient(145deg, rgba(102,126,234,0.65), rgba(118,75,162,0.55));
+    transform: scale(0.93);
+    border-color: #667eea;
+    box-shadow: 0 0 14px rgba(102,126,234,0.6);
+}
+
+/* Wide button (for LR / Platform) */
+.ugb-wide {
+    flex: 1;
+    height: 54px;
+    font-size: 1.1rem;
+    max-width: 160px;
+}
+
+/* Jump button accent */
+.ugb-jump {
+    background: linear-gradient(145deg, rgba(46,204,113,0.3), rgba(39,174,96,0.22));
+    border-color: rgba(46,204,113,0.7);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+}
+.ugb-jump:active { background: rgba(46,204,113,0.6); border-color: #2ecc71; box-shadow: 0 0 14px rgba(46,204,113,0.55); }
+
+/* Right-button accent colour */
+.ugb-accent {
+    background: linear-gradient(145deg, rgba(255,107,107,0.25), rgba(200,50,50,0.18));
+    border-color: rgba(255,107,107,0.6);
+}
+.ugb-accent:active { background: rgba(255,107,107,0.55); border-color: #ff6b6b; }
+
+/* Giant TAP button */
+.ugb-huge {
+    width: 100%;
+    max-width: 340px;
+    height: 58px;
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+    background: linear-gradient(145deg, rgba(102,126,234,0.3), rgba(118,75,162,0.25));
+    border-color: rgba(102,126,234,0.7);
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.75rem;
+}
+.ugb-huge:active { background: rgba(102,126,234,0.6); box-shadow: 0 0 20px rgba(102,126,234,0.7); }
+
+/* Game label shown in bar */
+.ugb-label {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.5rem;
+    color: rgba(102,126,234,0.7);
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+}

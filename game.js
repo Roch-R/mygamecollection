@@ -503,7 +503,88 @@ function startGame(game) {
     }
 
     showToast(`Starting ${getGameName(game)}!`, 'info');
+    showGameBar(game);
 }
+
+// ============================================
+// UNIVERSAL GAME BAR (mobile popup controls)
+// ============================================
+
+var _ugbGame = null;
+
+var UGB_PANELS = {
+    snake:       'ugb-dpad',
+    pacman:      'ugb-dpad',
+    shooter1945: 'ugb-dpad',
+    platformer:  'ugb-platform',
+    breakout:    'ugb-lr',
+    flappy:      'ugb-tap',
+    skyjump:     'ugb-tap'
+};
+var UGB_ALL_PANELS = ['ugb-dpad', 'ugb-platform', 'ugb-lr', 'ugb-tap'];
+
+function showGameBar(game) {
+    _ugbGame = game;
+    var bar = document.getElementById('ugb');
+    if (!bar) return;
+    // Hide all panels
+    UGB_ALL_PANELS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('ugb-hidden');
+    });
+    var panelId = UGB_PANELS[game];
+    if (panelId) {
+        var panel = document.getElementById(panelId);
+        if (panel) panel.classList.remove('ugb-hidden');
+        bar.classList.add('visible');
+    } else {
+        bar.classList.remove('visible');
+    }
+}
+
+function hideGameBar() {
+    _ugbGame = null;
+    var bar = document.getElementById('ugb');
+    if (bar) bar.classList.remove('visible');
+}
+
+var _ugbHeldKeys = {};
+
+function ugbDir(dir, down) {
+    // Visual press feedback
+    var btnMap = { up:'ugb-dpad', down:'ugb-dpad', left:'ugb-dpad', right:'ugb-dpad', jump:'ugb-platform', tap:'ugb-tap' };
+    if (down) { _ugbHeldKeys[dir] = true; } else { _ugbHeldKeys[dir] = false; }
+
+    var game = _ugbGame;
+    if (!game) return;
+
+    // Key code mapping
+    var codeMap = { up:'ArrowUp', down:'ArrowDown', left:'ArrowLeft', right:'ArrowRight', jump:'ArrowUp', tap:'Space' };
+    var code = codeMap[dir];
+
+    if (game === 'snake') {
+        if (down && window.setSnakeDir) { var sm = {up:'up',down:'down',left:'left',right:'right'}; setSnakeDir(sm[dir]||dir); }
+        return;
+    }
+    if (game === 'pacman') {
+        if (down && window.setPacmanDir) setPacmanDir(dir);
+        return;
+    }
+    if (game === 'flappy') {
+        if (down && window.flapBird) flapBird();
+        return;
+    }
+    if (game === 'skyjump') {
+        if (down) document.dispatchEvent(new KeyboardEvent('keydown', { code:'Space', key:' ', bubbles:true }));
+        return;
+    }
+    // For platformer, breakout, shooter1945 — dispatch real keydown/keyup
+    if (code) {
+        var type = down ? 'keydown' : 'keyup';
+        document.dispatchEvent(new KeyboardEvent(type, { code: code, key: code, bubbles: true }));
+    }
+}
+window.ugbDir = ugbDir;
 
 function restartBreakout() {
     if (window.initBreakout) {
@@ -521,6 +602,7 @@ function closeGame() {
         if (el) el.remove();
     });
 
+    hideGameBar();
     gameState.currentGame = null;
     document.getElementById('game-arena').classList.remove('active');
     document.querySelectorAll('.game-area').forEach(area => area.classList.add('hidden'));
